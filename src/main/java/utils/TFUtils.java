@@ -14,7 +14,7 @@ import java.util.List;
 
 public class TFUtils {
 
-    Tensor executeSavedModel(String modelFolderPath, Tensor input) {
+    public Tensor executeSavedModel(String modelFolderPath, Tensor input) {
         try {
             Path path = Paths.get(ClassLoader.getSystemClassLoader().getResource(modelFolderPath).toURI()).toAbsolutePath();
             //Parse model, and read all bytes or exit
@@ -27,7 +27,7 @@ public class TFUtils {
         }
     }
 
-    Tensor executeModelFromByteArray(byte[] graphDef, Tensor input) {
+    public Tensor executeModelFromByteArray(byte[] graphDef, Tensor input) {
         try (Graph g = new Graph()) {
             g.importGraphDef(graphDef);
             try (Session s = new Session(g)) {
@@ -45,7 +45,7 @@ public class TFUtils {
      * @param imageBytes
      * @return
      */
-    Tensor byteBufferToTensor(byte[] imageBytes) {
+    public Tensor byteBufferToTensor(byte[] imageBytes) {
         try (Graph g = new Graph()) {
             GraphBuilder graphBuilder = new GraphBuilder(g);
             // Some constants specific to the pre-trained model at:
@@ -128,5 +128,4 @@ public class TFUtils {
             return g.opBuilder(type, type).addInput(in1).addInput(in2).build().output(0);
         }
     }
-
 }
