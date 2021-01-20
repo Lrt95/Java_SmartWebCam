@@ -1,8 +1,9 @@
 package fxmlController;
 
+import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -17,47 +18,58 @@ import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class ApplicationController {
-
-    @FXML
-    public Text textFolder;
+public class ApplicationController implements Initializable {
 
     @FXML
     private Text textPath;
-
     @FXML
     private Text textObject;
-
     @FXML
     private Text textIndex;
-
     @FXML
     private Text textProbability;
-
     @FXML
     private ImageView imageView;
-
     @FXML
     private TextField objectsName;
-
     @FXML
-    private Spinner percentage;
-
+    private Spinner<Integer> percentage;
     @FXML
-    private Spinner time;
+    private Spinner<Integer> time;
 
-    @FXML
-    private Button button;
+    private final StringProperty folderSave;
+    public String getFolderSave() {
+        return folderSave.getValue();
+    }
+    public void setFolderSave(String value) {
+        folderSave.setValue(value);
+        checkCanSave();
+    }
+    public StringProperty folderSaveProperty() {
+        return folderSave;
+    }
 
-    private ImageDescription imageDescription;
+    private final  BooleanProperty disableSave;
+    public boolean getDisableSave() {
+        return disableSave.get();
+    }
+    public void    setDisableSave(boolean value) {
+        disableSave.set(value);
+    }
+    public         BooleanProperty disableSaveProperty() {
+        return disableSave;
+    }
 
     private Stage owner;
     private ArrayList<String> allLabels;
     private byte[] graphDef;
+    private ImageDescription imageDescription;
 
     public void setOwner(Stage value) {
         this.owner = value;
@@ -71,62 +83,34 @@ public class ApplicationController {
         this.graphDef = value;
     }
 
+    public ApplicationController() {
+        folderSave = new SimpleStringProperty(null);
+        disableSave = new SimpleBooleanProperty(true);
+    }
+
+    public void initialize(URL url, ResourceBundle resources) {
+
+    }
+
+    private void checkCanSave() {
+        setDisableSave(
+                folderSave.getValue() == null ||
+                imageDescription == null
+        );
+    }
+
     /**
      * set description on application after the tensor result
      * @param imageDescription of the tensor result
      */
-    public void setDescription(ImageDescription imageDescription){
+    private void setImageDescription(ImageDescription imageDescription){
         this.imageDescription = imageDescription;
-        setTextObject(this.imageDescription.getLabel());
-        setTextIndex(this.imageDescription.getIndex());
-        setTextProbability(this.imageDescription.getProbability());
-    }
-
-    /**
-     * set textPath on application for the image check
-     * @param path of the image check
-     */
-    @FXML
-    public void setTextPath(String path) {
-        textPath.setText("Path: " + path);
-    }
-
-    /**
-     * set textObject on application after the tensor result
-     * @param object of the tensor result
-     */
-    @FXML
-    private void setTextObject(String object) {
-        textObject.setText("Object: " + object);
-    }
-
-
-    /**
-     * set textIndex on application after the tensor result
-     * @param index of the tensor result
-     */
-    @FXML
-    private void setTextIndex(int index) {
-        textIndex.setText("Index: " + index);
-    }
-
-    /**
-     * set textProbability on application after the tensor result
-     * @param probability of the tensor result
-     */
-    @FXML
-    private void setTextProbability(float probability) {
-        textProbability.setText("Probability: " + Utils.round(probability * 100, 2)+ "%");
-    }
-
-    /**
-     * set image on application after the tensor result
-     * @param path of the image check
-     */
-    @FXML
-    public void setImagePath(String path) {
-        Image image = new Image("file:\\" + path);
-        this.imageView.setImage(image);
+        this.textObject.setText("Object: " + this.imageDescription.getLabel());
+        this.textIndex.setText("Index: " + this.imageDescription.getIndex());
+        this.textProbability.setText("Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%");
+        this.textPath.setText("Path: " + this.imageDescription.getPath());
+        this.imageView.setImage(new Image("file:\\" + this.imageDescription.getPath()));
+        checkCanSave();
     }
 
     @FXML
@@ -144,11 +128,6 @@ public class ApplicationController {
         return Integer.parseInt(this.time.getValue().toString());
     }
 
-    @FXML
-    private void handleButtonSave(ActionEvent event) {
-        SaveImage saveImage = new SaveImage(getPercentage(), getDescription(), this.textFolder.getText());
-        saveImage.save(this.imageDescription);
-    }
     /**
      * EventHandler of the button "Select Picture"
      * <p>
@@ -161,15 +140,11 @@ public class ApplicationController {
         File file = openFile();
         if (file != null) {
             TensorFlowUtils tensorFlowUtils = new TensorFlowUtils();
-
             Tensor<Float> tensor = tensorFlowUtils.executeModelFromByteArray(
                     this.graphDef,
                     tensorFlowUtils.byteBufferToTensor(Utils.readFileToBytes(file.getPath()))
             );
-
-            setDescription(tensorFlowUtils.getDescription(file.getPath(), tensor, this.allLabels));
-            setTextPath(file.getPath());
-            setImagePath(file.getPath());
+            setImageDescription(tensorFlowUtils.getDescription(file.getPath(), tensor, this.allLabels));
         }
     }
 
@@ -181,7 +156,6 @@ public class ApplicationController {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select a picture to open...");
         String sourceFolder = System.getProperty("user.dir") + "/src/main/resources/images";
-        //System.out.println("!!!!!!!!" + sourceFolder);
         chooser.setInitialDirectory(new File(sourceFolder));
         FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg");
         chooser.getExtensionFilters().add(fileExtensions);
@@ -198,8 +172,8 @@ public class ApplicationController {
     private void selectSaveFolderButtonClick(ActionEvent event) {
         File file = openDirectory();
         if (file != null) {
-            System.out.println("folder selected: " + file.getPath());
-            textFolder.setText(file.getPath());
+            setFolderSave(file.getPath());
+            //folderSave.setValue(file.getPath());
         }
     }
 
@@ -212,5 +186,11 @@ public class ApplicationController {
         chooser.setTitle("Select a folder to save image...");
         chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         return chooser.showDialog(this.owner);
+    }
+
+    @FXML
+    private void handleButtonSave(ActionEvent event) {
+        SaveImage saveImage = new SaveImage(getPercentage(), getDescription(), folderSave.getValue());
+        saveImage.save(this.imageDescription);
     }
 }
