@@ -98,19 +98,18 @@
             </rowConstraints>
 
             <Text text="Name: " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="objectsName" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <TextField fx:id="textFieldPictureName" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                       onKeyPressed="#pictureNameKeyPressed" />
 
             <Text text="Percentage: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <Spinner fx:id="percentage" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="CENTER">
-                <valueFactory>
-                    <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="100"/>
-                </valueFactory>
-            </Spinner>
+            <Slider fx:id="sliderPercentage" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                    majorTickUnit="20" minorTickCount="10"
+                    showTickLabels="true" showTickMarks="true" />
 
             <Text text="Time (sec): " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <Spinner fx:id="time" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+            <Spinner fx:id="spinnerTime" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                 <valueFactory>
-                    <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="999999999"/>
+                    <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="999999"/>
                 </valueFactory>
             </Spinner>
 

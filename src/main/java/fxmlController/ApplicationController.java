@@ -4,10 +4,12 @@ import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -37,21 +39,23 @@ public class ApplicationController implements Initializable {
     @FXML
     private ImageView imageView;
     @FXML
-    private TextField objectsName;
+    private TextField textFieldPictureName;
+//    @FXML
+//    private Spinner<Integer> spinnerPercentage;
     @FXML
-    private Spinner<Integer> percentage;
+    public Slider sliderPercentage;
     @FXML
-    private Spinner<Integer> time;
+    private Spinner<Integer> spinnerTime;
 
     private final StringProperty folderSave;
     public String getFolderSave() {
         return folderSave.getValue();
     }
-    public void setFolderSave(String value) {
+    public void   setFolderSave(String value) {
         folderSave.setValue(value);
         checkCanSave();
     }
-    public StringProperty folderSaveProperty() {
+    public        StringProperty folderSaveProperty() {
         return folderSave;
     }
 
@@ -66,10 +70,13 @@ public class ApplicationController implements Initializable {
         return disableSave;
     }
 
+    private final String OS;
     private Stage owner;
     private ArrayList<String> allLabels;
     private byte[] graphDef;
     private ImageDescription imageDescription;
+
+    private int percentage;
 
     public void setOwner(Stage value) {
         this.owner = value;
@@ -84,18 +91,29 @@ public class ApplicationController implements Initializable {
     }
 
     public ApplicationController() {
+        this.OS = System.getProperty("os.name").toLowerCase();
         folderSave = new SimpleStringProperty(null);
         disableSave = new SimpleBooleanProperty(true);
     }
 
     public void initialize(URL url, ResourceBundle resources) {
+        sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
+            percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
+            System.out.println(percentage);
+            //textField.setText(Double.toString(newValue.intValue()));
+        });
+    }
 
+    private void checkPictureName() {
+        this.textFieldPictureName.setText(this.textFieldPictureName.getText().replaceAll("  ", " ").trim());
     }
 
     private void checkCanSave() {
         setDisableSave(
-                folderSave.getValue() == null ||
-                imageDescription == null
+            folderSave.getValue() == null ||
+            getDescription() == null ||
+            getDescription().length() == 0 ||
+            imageDescription == null
         );
     }
 
@@ -109,23 +127,25 @@ public class ApplicationController implements Initializable {
         this.textIndex.setText("Index: " + this.imageDescription.getIndex());
         this.textProbability.setText("Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%");
         this.textPath.setText("Path: " + this.imageDescription.getPath());
-        this.imageView.setImage(new Image("file:\\" + this.imageDescription.getPath()));
+        String separator = OS.contains("win") ? "/" : "//";
+        this.imageView.setImage(new Image("file:" + separator + this.imageDescription.getPath()));
+        checkPictureName();
         checkCanSave();
     }
 
     @FXML
     private String getDescription() {
-        return this.objectsName.getText();
+        return this.textFieldPictureName.getText();
     }
 
     @FXML
-    private Integer getPercentage() {
-        return Integer.parseInt(this.percentage.getValue().toString());
+    private Integer getSpinnerPercentage() {
+        return (int)sliderPercentage.getValue();
     }
 
     @FXML
-    private Integer getTime() {
-        return Integer.parseInt(this.time.getValue().toString());
+    private Integer getSpinnerTime() {
+        return Integer.parseInt(this.spinnerTime.getValue().toString());
     }
 
     /**
@@ -173,8 +193,8 @@ public class ApplicationController implements Initializable {
         File file = openDirectory();
         if (file != null) {
             setFolderSave(file.getPath());
-            //folderSave.setValue(file.getPath());
         }
+        checkPictureName();
     }
 
     /**
@@ -190,7 +210,13 @@ public class ApplicationController implements Initializable {
 
     @FXML
     private void handleButtonSave(ActionEvent event) {
-        SaveImage saveImage = new SaveImage(getPercentage(), getDescription(), folderSave.getValue());
+        checkPictureName();
+        SaveImage saveImage = new SaveImage(getSpinnerPercentage(), getDescription(), folderSave.getValue());
         saveImage.save(this.imageDescription);
+    }
+
+    @FXML
+    private void pictureNameKeyPressed(KeyEvent keyEvent) {
+        checkCanSave();
     }
 }
