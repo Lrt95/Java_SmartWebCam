@@ -2,11 +2,16 @@ package fxmlController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import utils.ImageDescription;
 import utils.Utils;
+
+import java.awt.*;
 
 public class ApplicationController {
 
@@ -26,11 +31,15 @@ public class ApplicationController {
     @FXML
     private ImageView image;
 
-//    @FXML
-//    private void handleButtonAction(ActionEvent event) {
-//        System.out.println("You clicked me!");
-//        description.setText("Hello World!");
-//    }
+    @FXML
+    private TextField objectsName;
+
+    @FXML
+    private Spinner percentage;
+
+    @FXML
+    private Button button;
+
 
     /**
      * set description on application after the tensor result
@@ -85,12 +94,23 @@ public class ApplicationController {
      */
     @FXML
     public void setImagePath(String path) {
+        System.out.println(this.getClass().getResource(path).toString());
         this.image.setImage(new Image(this.getClass().getResource(path).toString()));
     }
 
+    @FXML
+    private String getDescription() {
+        return this.objectsName.getText();
+    }
+
+    @FXML
+    private String getPercentage() {
+        return this.percentage.getValue().toString();
+    }
 
     @FXML
     private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
+        System.out.println(getDescription());
+        System.out.println(getPercentage());
     }
 }
