@@ -18,6 +18,7 @@ import utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ApplicationController {
 
@@ -167,8 +168,8 @@ public class ApplicationController {
     private File openFile() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select a picture to open...");
-        String sourceFolder = System.getProperty("user.dir") + "\\src\\main\\resources\\images";
-        chooser.setInitialDirectory(new File(sourceFolder));
+//        String sourceFolder = System.getProperty("user.dir") + "\\src\\main\\resources\\images";
+//        chooser.setInitialDirectory(new File(sourceFolder));
         FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg");
         chooser.getExtensionFilters().add(fileExtensions);
         return chooser.showOpenDialog(this.owner);
