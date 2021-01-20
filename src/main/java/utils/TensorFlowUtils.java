@@ -1,7 +1,6 @@
 package utils;
 
 import org.tensorflow.*;
-import utils.Utils;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -87,30 +86,7 @@ public class TensorFlowUtils {
         return new ImageDescription(index, probabilities[index], labels.get(index));
     }
 
-    public class ImageDescription {
 
-        private final int index;
-        private final float probability;
-        private final String label;
-
-        public ImageDescription(int index, float probability, String label) {
-            this.index = index;
-            this.probability = probability;
-            this.label = label;
-        }
-
-        public int getIndex() {
-            return this.index;
-        }
-
-        public float getProbability() {
-            return this.probability;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-    }
 
     private static class GraphBuilder {
         private Graph g;

@@ -4,22 +4,70 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.text.Text?>
-<GridPane fx:controller="fxmlconroller.ApplicationController" xmlns:fx="http://javafx.com/fxml"
-          prefHeight="200" prefWidth="320"
-          alignment="center" hgap="10" vgap="10">
+<GridPane fx:controller="fxmlController.ApplicationController" xmlns:fx="http://javafx.com/fxml"
+          prefHeight="720" prefWidth="1280"
+          hgap="10" vgap="10">
+    <columnConstraints>
+        <ColumnConstraints minWidth="10.0" percentWidth="50.0" />
+        <ColumnConstraints minWidth="10.0" percentWidth="50.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" percentHeight="40.0" />
+        <RowConstraints minHeight="10.0" percentHeight="60.0" />
+    </rowConstraints>
 
-    <Text GridPane.columnIndex="0" GridPane.rowIndex="0"
-          GridPane.columnSpan="2" fx:id="target"/>
+    <GridPane GridPane.columnIndex="0" hgap="10" vgap="10" >
+        <columnConstraints>
+            <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" percentHeight="10.0" />
+            <RowConstraints minHeight="10.0" percentHeight="70.0" />
+            <RowConstraints minHeight="10.0" percentHeight="20.0" />
+        </rowConstraints>
 
-    <Label text="Who are you?"
-           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <GridPane GridPane.rowIndex="0" hgap="10" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
+            </columnConstraints>
 
-    <Button id="button"  text="Click Me!"
-            onAction="#handleButtonAction" fx:id="button"
-            GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Button GridPane.columnIndex="0" text="Select picture" onAction="#handleButtonAction" />
+            <Text GridPane.columnIndex="1" id="lblPath" fx:id="textPath" text="Path :" />
+        </GridPane>
 
-    <Label id="label" fx:id="description"
-           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <GridPane GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.halignment="CENTER" >
+            <ImageView fx:id="image"
+                       fitHeight="200"
+                       pickOnBounds="true" preserveRatio="true"
+            >
+                <Image url="@../images/retriever.jpg" />
+            </ImageView>
+        </GridPane>
+
+        <GridPane GridPane.rowIndex="2" hgap="10" vgap="10" >
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" percentWidth="33.3" />
+                <ColumnConstraints minWidth="10.0" percentWidth="33.3" />
+                <ColumnConstraints minWidth="10.0" percentWidth="33.3" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" percentHeight="50.0" />
+                <RowConstraints minHeight="10.0" percentHeight="50.0" />
+            </rowConstraints>
+
+            <Text GridPane.rowIndex="0" GridPane.columnIndex="0" text="Description :"/>
+            <Text GridPane.rowIndex="1" GridPane.columnIndex="0" text="Index :" fx:id="textIndex"/>
+            <Text GridPane.rowIndex="1" GridPane.columnIndex="1" text="Object :" fx:id="textObject"/>
+            <Text GridPane.rowIndex="1" GridPane.columnIndex="2" text="Probability :" fx:id="textProbability"/>
+        </GridPane>
+
+    </GridPane>
+
+<!--    <Button id="button"  text="Click Me!"-->
+<!--            onAction="#handleButtonAction" fx:id="button"-->
+<!--            GridPane.columnIndex="0" GridPane.rowIndex="2"/>-->
 
 </GridPane>
