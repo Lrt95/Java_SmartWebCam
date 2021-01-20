@@ -8,12 +8,21 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.tensorflow.Tensor;
 import utils.ImageDescription;
+import utils.TensorFlowUtils;
 import utils.Utils;
 
-import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class ApplicationController {
+
+    @FXML
+    public Text textFolder;
 
     @FXML
     private Text textPath;
@@ -24,12 +33,11 @@ public class ApplicationController {
     @FXML
     private Text textIndex;
 
-
     @FXML
     private Text textProbability;
 
     @FXML
-    private ImageView image;
+    private ImageView imageView;
 
     @FXML
     private TextField objectsName;
@@ -40,6 +48,21 @@ public class ApplicationController {
     @FXML
     private Button button;
 
+    private Stage owner;
+    private ArrayList<String> allLabels;
+    private byte[] graphDef;
+
+    public void setOwner(Stage value) {
+        this.owner = value;
+    }
+
+    public void setAllLabels(ArrayList<String> value) {
+        this.allLabels = value;
+    }
+
+    public void setGraphDef(byte[] value) {
+        this.graphDef = value;
+    }
 
     /**
      * set description on application after the tensor result
@@ -94,8 +117,7 @@ public class ApplicationController {
      */
     @FXML
     public void setImagePath(String path) {
-        System.out.println(this.getClass().getResource(path).toString());
-        this.image.setImage(new Image(this.getClass().getResource(path).toString()));
+        this.imageView.setImage(new Image("file:\\" + path));
     }
 
     @FXML
@@ -112,5 +134,69 @@ public class ApplicationController {
     private void handleButtonAction(ActionEvent event) {
         System.out.println(getDescription());
         System.out.println(getPercentage());
+    }
+    /**
+     * EventHandler of the button "Select Picture"
+     * <p>
+     * Select a file and get it to TensorFlow and the data.
+     * @param event The event given by the sender
+     * @throws IOException if file not exists
+     */
+    @FXML
+    private void selectPictureButtonClick(ActionEvent event) throws IOException {
+        File file = openFile();
+        if (file != null) {
+            TensorFlowUtils tensorFlowUtils = new TensorFlowUtils();
+
+            Tensor<Float> tensor = tensorFlowUtils.executeModelFromByteArray(
+                    this.graphDef,
+                    tensorFlowUtils.byteBufferToTensor(Utils.readFileToBytes(file.getPath()))
+            );
+
+            ImageDescription description = tensorFlowUtils.getDescription(tensor, this.allLabels);
+            setTextPath(file.getPath());
+            setDescription(description);
+            setImagePath(file.getPath());
+        }
+    }
+
+    /**
+     * Select a file with a chooser window
+     * @return The selected file
+     */
+    private File openFile() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select a picture to open...");
+        String sourceFolder = System.getProperty("user.dir") + "\\src\\main\\resources\\images";
+        chooser.setInitialDirectory(new File(sourceFolder));
+        FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg");
+        chooser.getExtensionFilters().add(fileExtensions);
+        return chooser.showOpenDialog(this.owner);
+    }
+
+    /**
+     * EventHandler of the button "Select Save Folder"
+     * <p>
+     * Select a folder to save the picture.
+     * @param event The event given by the sender
+     */
+    @FXML
+    private void selectSaveFolderButtonClick(ActionEvent event) {
+        File file = openDirectory();
+        if (file != null) {
+            System.out.println("folder selected: " + file.getPath());
+            textFolder.setText(file.getPath());
+        }
+    }
+
+    /**
+     * Select a folder with a chooser window
+     * @return The selected folder
+     */
+    private File openDirectory() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select a folder to save image...");
+        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        return chooser.showDialog(this.owner);
     }
 }
