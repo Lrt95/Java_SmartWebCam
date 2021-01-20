@@ -219,9 +219,6 @@ public class ApplicationController implements Initializable {
     @FXML
     private void setCam() throws FrameGrabber.Exception {
 
-
-        String[] test = OpenCVFrameGrabber.getDeviceDescriptions();
-        System.out.println(test);
         OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(2);
 
 
@@ -231,9 +228,10 @@ public class ApplicationController implements Initializable {
             Frame frame;
             while (true) {
                 try {
+                    Thread.sleep(0);
                     frame = grabber.grabFrame();
                     camVIew.setImage(frameToImage(frame));
-                } catch (FrameGrabber.Exception e) {
+                } catch (FrameGrabber.Exception | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
