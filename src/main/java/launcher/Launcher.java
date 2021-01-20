@@ -1,18 +1,17 @@
 package launcher;
 
 import fxmlController.ApplicationController;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.tensorflow.Tensor;
-import utils.ImageDescription;
-import utils.TensorFlowUtils;
-import utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import utils.Utils;
 
 public class Launcher extends Application {
 

@@ -14,17 +14,20 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.tensorflow.Tensor;
-import saveImage.SaveImage;
-import utils.ImageDescription;
-import utils.TensorFlowUtils;
-import utils.Utils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import org.tensorflow.Tensor;
+
+import saveImage.SaveImage;
+
+import utils.ImageDescription;
+import utils.TensorFlowUtils;
+import utils.Utils;
 
 public class ApplicationController implements Initializable {
 
@@ -40,33 +43,39 @@ public class ApplicationController implements Initializable {
     private ImageView imageView;
     @FXML
     private TextField textFieldPictureName;
-//    @FXML
-//    private Spinner<Integer> spinnerPercentage;
     @FXML
-    public Slider sliderPercentage;
+    private Slider sliderPercentage;
+    @FXML
+    private Text textPercentage;
     @FXML
     private Spinner<Integer> spinnerTime;
 
     private final StringProperty folderSave;
+
     public String getFolderSave() {
         return folderSave.getValue();
     }
-    public void   setFolderSave(String value) {
+
+    public void setFolderSave(String value) {
         folderSave.setValue(value);
         checkCanSave();
     }
-    public        StringProperty folderSaveProperty() {
+
+    public StringProperty folderSaveProperty() {
         return folderSave;
     }
 
-    private final  BooleanProperty disableSave;
+    private final BooleanProperty disableSave;
+
     public boolean getDisableSave() {
         return disableSave.get();
     }
-    public void    setDisableSave(boolean value) {
+
+    public void setDisableSave(boolean value) {
         disableSave.set(value);
     }
-    public         BooleanProperty disableSaveProperty() {
+
+    public BooleanProperty disableSaveProperty() {
         return disableSave;
     }
 
@@ -90,29 +99,51 @@ public class ApplicationController implements Initializable {
         this.graphDef = value;
     }
 
+    private String getPictureName() {
+        return this.textFieldPictureName.getText();
+    }
+
+    private int getSpinnerTime() {
+        return Integer.parseInt(this.spinnerTime.getValue().toString());
+    }
+
+    /**
+     * ApplicationController constructor
+     */
     public ApplicationController() {
         this.OS = System.getProperty("os.name").toLowerCase();
         folderSave = new SimpleStringProperty(null);
         disableSave = new SimpleBooleanProperty(true);
     }
 
+    /**
+     * Call after the controller was created.
+     * @param url Url
+     * @param resources Resources
+     */
     public void initialize(URL url, ResourceBundle resources) {
         sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
             percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
-            System.out.println(percentage);
-            //textField.setText(Double.toString(newValue.intValue()));
+            textPercentage.setText(percentage + " %");
         });
     }
 
+    /**
+     * Remove the double spaces in the textField of PictureName
+     */
     private void checkPictureName() {
         this.textFieldPictureName.setText(this.textFieldPictureName.getText().replaceAll("  ", " ").trim());
     }
 
+    /**
+     * Check if the user can save the image.
+     * Need a folder save, a loaded picture and a picture name.
+     */
     private void checkCanSave() {
         setDisableSave(
             folderSave.getValue() == null ||
-            getDescription() == null ||
-            getDescription().length() == 0 ||
+            getPictureName() == null ||
+            getPictureName().length() == 0 ||
             imageDescription == null
         );
     }
@@ -131,21 +162,6 @@ public class ApplicationController implements Initializable {
         this.imageView.setImage(new Image("file:" + separator + this.imageDescription.getPath()));
         checkPictureName();
         checkCanSave();
-    }
-
-    @FXML
-    private String getDescription() {
-        return this.textFieldPictureName.getText();
-    }
-
-    @FXML
-    private Integer getSpinnerPercentage() {
-        return (int)sliderPercentage.getValue();
-    }
-
-    @FXML
-    private Integer getSpinnerTime() {
-        return Integer.parseInt(this.spinnerTime.getValue().toString());
     }
 
     /**
@@ -208,13 +224,21 @@ public class ApplicationController implements Initializable {
         return chooser.showDialog(this.owner);
     }
 
+    /**
+     * Save the picture to the save folder selected
+     * @param event The event raise by the sender
+     */
     @FXML
     private void handleButtonSave(ActionEvent event) {
         checkPictureName();
-        SaveImage saveImage = new SaveImage(getSpinnerPercentage(), getDescription(), folderSave.getValue());
+        SaveImage saveImage = new SaveImage(this.percentage, getPictureName(), folderSave.getValue());
         saveImage.save(this.imageDescription);
     }
 
+    /**
+     * EventHandler on KeyPress on the TextField of PictureName
+     * @param keyEvent The event raise by the sender
+     */
     @FXML
     private void pictureNameKeyPressed(KeyEvent keyEvent) {
         checkCanSave();
