@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.FXMLDocumentController">
-    <children>
-        <Button layoutX="126" layoutY="90" text="Click Me!" onAction="#handleButtonAction" fx:id="button" />
-        <Label layoutX="126" layoutY="120" minHeight="16" minWidth="69" fx:id="label" />
-    </children>
-</AnchorPane>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.text.Text?>
+<GridPane fx:controller="fxmlconroller.ApplicationController" xmlns:fx="http://javafx.com/fxml"
+          prefHeight="200" prefWidth="320"
+          alignment="center" hgap="10" vgap="10">
+
+    <Text text="java-Buddy"
+          GridPane.columnIndex="0" GridPane.rowIndex="0"
+          GridPane.columnSpan="2"/>
+
+    <Label text="Who are you?"
+           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+    <Button id="button"  text="Click Me!"
+            onAction="#handleButtonAction" fx:id="button"
+            GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+
+    <Label id="label" fx:id="description"
+           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+
+</GridPane>
