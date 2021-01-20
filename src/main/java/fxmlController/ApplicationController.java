@@ -12,6 +12,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.tensorflow.Tensor;
+import saveImage.SaveImage;
 import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
@@ -47,7 +48,12 @@ public class ApplicationController {
     private Spinner percentage;
 
     @FXML
+    private Spinner time;
+
+    @FXML
     private Button button;
+
+    private ImageDescription imageDescription;
 
     private Stage owner;
     private ArrayList<String> allLabels;
@@ -70,9 +76,10 @@ public class ApplicationController {
      * @param imageDescription of the tensor result
      */
     public void setDescription(ImageDescription imageDescription){
-        setTextObject(imageDescription.getLabel());
-        setTextIndex(imageDescription.getIndex());
-        setTextProbability(imageDescription.getProbability());
+        this.imageDescription = imageDescription;
+        setTextObject(this.imageDescription.getLabel());
+        setTextIndex(this.imageDescription.getIndex());
+        setTextProbability(this.imageDescription.getProbability());
     }
 
     /**
@@ -118,7 +125,8 @@ public class ApplicationController {
      */
     @FXML
     public void setImagePath(String path) {
-        this.imageView.setImage(new Image("file:\\" + path));
+        Image image = new Image("file:\\" + path);
+        this.imageView.setImage(image);
     }
 
     @FXML
@@ -127,14 +135,19 @@ public class ApplicationController {
     }
 
     @FXML
-    private String getPercentage() {
-        return this.percentage.getValue().toString();
+    private Integer getPercentage() {
+        return Integer.parseInt(this.percentage.getValue().toString());
     }
 
     @FXML
-    private void handleButtonAction(ActionEvent event) {
-        System.out.println(getDescription());
-        System.out.println(getPercentage());
+    private Integer getTime() {
+        return Integer.parseInt(this.time.getValue().toString());
+    }
+
+    @FXML
+    private void handleButtonSave(ActionEvent event) {
+        SaveImage saveImage = new SaveImage(getPercentage(), getDescription(), this.textFolder.getText());
+        saveImage.save(this.imageDescription);
     }
     /**
      * EventHandler of the button "Select Picture"
@@ -154,9 +167,8 @@ public class ApplicationController {
                     tensorFlowUtils.byteBufferToTensor(Utils.readFileToBytes(file.getPath()))
             );
 
-            ImageDescription description = tensorFlowUtils.getDescription(tensor, this.allLabels);
+            setDescription(tensorFlowUtils.getDescription(file.getPath(), tensor, this.allLabels));
             setTextPath(file.getPath());
-            setDescription(description);
             setImagePath(file.getPath());
         }
     }
@@ -168,8 +180,9 @@ public class ApplicationController {
     private File openFile() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select a picture to open...");
-//        String sourceFolder = System.getProperty("user.dir") + "\\src\\main\\resources\\images";
-//        chooser.setInitialDirectory(new File(sourceFolder));
+        String sourceFolder = System.getProperty("user.dir") + "/src/main/resources/images";
+        //System.out.println("!!!!!!!!" + sourceFolder);
+        chooser.setInitialDirectory(new File(sourceFolder));
         FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg");
         chooser.getExtensionFilters().add(fileExtensions);
         return chooser.showOpenDialog(this.owner);

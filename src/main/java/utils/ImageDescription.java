@@ -5,8 +5,10 @@ public class ImageDescription {
     private final int index;
     private final float probability;
     private final String label;
+    private final String path;
 
-    public ImageDescription(int index, float probability, String label) {
+    public ImageDescription(String path, int index, float probability, String label) {
+        this.path = path;
         this.index = index;
         this.probability = probability;
         this.label = label;
@@ -21,7 +23,8 @@ public class ImageDescription {
     }
 
     public String getLabel() {
-        return label;
+        return this.label;
     }
+    public String getPath() { return this.path; }
 }
 

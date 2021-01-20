@@ -82,17 +82,39 @@
             <Text GridPane.columnIndex="1" id="lblPath" fx:id="textFolder" text="Path :" />
         </GridPane>
         <GridPane GridPane.rowIndex="1" hgap="10" vgap="10">
-            <TextField text="toto" fx:id="objectsName" GridPane.rowIndex="0" />
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="30.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" percentHeight="25.0" />
+                <RowConstraints minHeight="10.0" percentHeight="25.0" />
+                <RowConstraints minHeight="10.0" percentHeight="25.0" />
+                <RowConstraints minHeight="10.0" percentHeight="25.0" />
+            </rowConstraints>
+            <Text text="name: " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField text="toto" fx:id="objectsName" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-            <Spinner fx:id="percentage" GridPane.rowIndex="1">
+            <Text text="percentage: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Spinner fx:id="percentage" GridPane.rowIndex="1" GridPane.columnIndex="1">
                 <valueFactory>
                     <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="100"/>
                 </valueFactory>
             </Spinner>
 
-            <Button id="button"  text="Click Me!"
-                    onAction="#handleButtonAction" fx:id="button"
-                    GridPane.rowIndex="2"/>
+            <Text text="time(sec): " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Spinner fx:id="time" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                <valueFactory>
+                    <SpinnerValueFactory.IntegerSpinnerValueFactory min="0"/>
+                </valueFactory>
+            </Spinner>
+
+            <Button
+                    id="button" text="Save"
+                    onAction="#handleButtonSave" fx:id="button"
+                    GridPane.rowIndex="3" GridPane.columnIndex="1"
+            />
+
         </GridPane>
 
     </GridPane>

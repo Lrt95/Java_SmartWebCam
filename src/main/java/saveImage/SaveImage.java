@@ -2,37 +2,34 @@ package saveImage;
 
 import utils.ImageDescription;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SaveImage {
     Integer percentage;
     String objectsName;
-    File file;
+    String filePath;
 
-    public SaveImage(Integer percentage, String objectsName, File file) {
+    public SaveImage(Integer percentage, String objectsName, String filePath) {
         this.percentage = percentage;
         this.objectsName = objectsName;
-        this.file = file;
+        this.filePath = filePath;
     }
 
-    public void save(ImageDescription imageDescription, String imagePath) throws IOException {
-        List<String> listObjectsName = new ArrayList<>();
-        for(String objectName : this.objectsName.split(" ")){
-            listObjectsName.add(objectName);
-        }
+    public void save(ImageDescription imageDescription) {
+        List<String> listObjectsName = new ArrayList<>(Arrays.asList(this.objectsName.split(" ")));
 
-        if(this.percentage <= imageDescription.getProbability() && listObjectsName.contains(imageDescription.getLabel())){
+        if(this.percentage <= imageDescription.getProbability() * 100 && listObjectsName.contains(imageDescription.getLabel())){
             try {
-                FileWriter myWriter = new FileWriter("");
-                myWriter.write("Files in Java might be tricky, but it is fun enough!");
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                File newfile = new File(imageDescription.getPath());
+                BufferedImage bufferedImage = null;
+                bufferedImage = ImageIO.read(newfile);
+                ImageIO.write(bufferedImage, "jpg", new File(filePath + "/" + imageDescription.getLabel() + ".jpg"));
             } catch (IOException e) {
                 System.out.println("An error occurred.");
                 e.printStackTrace();
