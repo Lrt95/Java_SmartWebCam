@@ -9,9 +9,8 @@
           prefHeight="200" prefWidth="320"
           alignment="center" hgap="10" vgap="10">
 
-    <Text text="java-Buddy"
-          GridPane.columnIndex="0" GridPane.rowIndex="0"
-          GridPane.columnSpan="2"/>
+    <Text GridPane.columnIndex="0" GridPane.rowIndex="0"
+          GridPane.columnSpan="2" fx:id="target"/>
 
     <Label text="Who are you?"
            GridPane.columnIndex="0" GridPane.rowIndex="1"/>
@@ -22,6 +21,5 @@
 
     <Label id="label" fx:id="description"
            GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
 
 </GridPane>

@@ -1,5 +1,6 @@
 package launcher;
 
+import fxmlconroller.ApplicationController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -90,9 +91,14 @@ public class Launcher extends Application {
 //        primaryStage.setScene(new Scene(root, 600, 600));
 //        primaryStage.show();
 
+
+        String test = "Yolo";
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/application.fxml"));
         Parent root = loader.load();
+
+        ApplicationController controller = loader.<ApplicationController>getController();
+        controller.setData(test);
 
         Scene scene = new Scene(root);
 
