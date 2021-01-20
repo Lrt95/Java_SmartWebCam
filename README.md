@@ -2,7 +2,7 @@
 Project Java (JDK 15.0.1) with Gradle
 
 ## Use:
-- TensorFlow
+- utils.TensorFlowUtils
 - OpenCV
 - JavaFX
 - Swing
