@@ -26,10 +26,13 @@ import utils.Utils;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.concurrent.Executors;
 
 public class ApplicationController implements Initializable {
@@ -78,6 +81,7 @@ public class ApplicationController implements Initializable {
         return disableSave;
     }
 
+    private final String OS;
     private Stage owner;
     private ArrayList<String> allLabels;
     private byte[] graphDef;
@@ -96,6 +100,7 @@ public class ApplicationController implements Initializable {
     }
 
     public ApplicationController() {
+        this.OS = System.getProperty("os.name").toLowerCase();
         folderSave = new SimpleStringProperty(null);
         disableSave = new SimpleBooleanProperty(true);
     }
@@ -213,7 +218,13 @@ public class ApplicationController implements Initializable {
 
     @FXML
     private void setCam() throws FrameGrabber.Exception {
-        OpenCVFrameGrabber grabber = new  OpenCVFrameGrabber(0);
+
+
+        String[] test = OpenCVFrameGrabber.getDeviceDescriptions();
+        System.out.println(test);
+        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(2);
+
+
         grabber.start();
 
         Executors.newSingleThreadExecutor().execute(() -> {
