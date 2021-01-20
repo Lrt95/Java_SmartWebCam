@@ -1,6 +1,7 @@
 package fxmlController;
 
 import javafx.beans.property.*;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -8,23 +9,32 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.FrameGrabber;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.OpenCVFrameGrabber;
 import org.tensorflow.Tensor;
 import saveImage.SaveImage;
 import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
 
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
 public class ApplicationController implements Initializable {
+
+    private final Java2DFrameConverter java2DFrameConverter = new Java2DFrameConverter();
 
     @FXML
     private Text textPath;
@@ -36,6 +46,8 @@ public class ApplicationController implements Initializable {
     private Text textProbability;
     @FXML
     private ImageView imageView;
+    @FXML
+    private ImageView camVIew;
     @FXML
     private TextField objectsName;
     @FXML
@@ -89,7 +101,11 @@ public class ApplicationController implements Initializable {
     }
 
     public void initialize(URL url, ResourceBundle resources) {
-
+        try {
+            setCam();
+        } catch (FrameGrabber.Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void checkCanSave() {
@@ -109,7 +125,8 @@ public class ApplicationController implements Initializable {
         this.textIndex.setText("Index: " + this.imageDescription.getIndex());
         this.textProbability.setText("Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%");
         this.textPath.setText("Path: " + this.imageDescription.getPath());
-        this.imageView.setImage(new Image("file:\\" + this.imageDescription.getPath()));
+        System.out.println(this.imageDescription.getPath());
+        this.imageView.setImage(new Image("file://" + this.imageDescription.getPath()));
         checkCanSave();
     }
 
@@ -193,4 +210,29 @@ public class ApplicationController implements Initializable {
         SaveImage saveImage = new SaveImage(getPercentage(), getDescription(), folderSave.getValue());
         saveImage.save(this.imageDescription);
     }
+
+    @FXML
+    private void setCam() throws FrameGrabber.Exception {
+        OpenCVFrameGrabber grabber = new  OpenCVFrameGrabber(0);
+        grabber.start();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            Frame frame;
+            while (true) {
+                try {
+                    frame = grabber.grabFrame();
+                    camVIew.setImage(frameToImage(frame));
+                } catch (FrameGrabber.Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+    }
+
+    private WritableImage frameToImage(Frame frame) {
+        BufferedImage bufferedImage = java2DFrameConverter.getBufferedImage(frame);
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+
 }

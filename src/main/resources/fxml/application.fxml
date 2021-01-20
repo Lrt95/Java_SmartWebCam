@@ -6,6 +6,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.image.Image?>
 <GridPane fx:controller="fxmlController.ApplicationController" xmlns:fx="http://javafx.com/fxml"
           prefHeight="720" prefWidth="1280"
           hgap="10" vgap="10">
@@ -39,7 +40,7 @@
         </GridPane>
 
         <GridPane GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.halignment="CENTER">
-            <ImageView fx:id="imageView"
+            <ImageView fx:id="camVIew"
                        fitHeight="200"
                        pickOnBounds="true" preserveRatio="true"
             />
