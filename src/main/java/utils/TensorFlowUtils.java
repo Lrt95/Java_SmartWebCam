@@ -1,3 +1,5 @@
+package utils;
+
 import org.tensorflow.*;
 import utils.Utils;
 
@@ -8,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class TensorFlow {
+public class TensorFlowUtils {
 
     public Tensor<Float> executeSavedModel(String modelFolderPath, Tensor<Float> input) {
         try {
