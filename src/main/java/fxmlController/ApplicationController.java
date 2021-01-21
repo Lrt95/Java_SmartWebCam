@@ -68,16 +68,16 @@ public class ApplicationController implements Initializable {
         return folderSave;
     }
 
-    private final BooleanProperty enableWebCam;
+    private final BooleanProperty disabledWebCam;
 
-    public boolean getEnabledWebCam() {
-        return this.enableWebCam.get();
+    public boolean getDisabledWebCam() {
+        return this.disabledWebCam.get();
     }
 
-    public void setEnabledWebCam(boolean value) { this.enableWebCam.set(value); }
+    public void setDisabledWebCam(boolean value) { this.disabledWebCam.set(value); }
 
-    public BooleanProperty enableWebCamProperty() {
-        return this.enableWebCam;
+    public BooleanProperty disabledWebCamProperty() {
+        return this.disabledWebCam;
     }
 
     private final BooleanProperty disableSave;
@@ -129,7 +129,7 @@ public class ApplicationController implements Initializable {
         this.OS = System.getProperty("os.name").toLowerCase();
         this.folderSave = new SimpleStringProperty(null);
         this.disableSave = new SimpleBooleanProperty(true);
-        this.enableWebCam = new SimpleBooleanProperty(false);
+        this.disabledWebCam = new SimpleBooleanProperty(true);
     }
 
     /**
@@ -202,9 +202,7 @@ public class ApplicationController implements Initializable {
 
     @FXML
     private void onSwitchSelected(MouseEvent event) {
-        this.setEnabledWebCam(!getEnabledWebCam());
-        System.out.println(this.enableWebCam);
-
+        this.setDisabledWebCam(!getDisabledWebCam());
     }
 
     /**

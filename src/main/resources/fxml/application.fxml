@@ -29,7 +29,8 @@
             <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints minHeight="10.0" percentHeight="10.0" />
+            <RowConstraints minHeight="10.0" percentHeight="02.0" />
+            <RowConstraints minHeight="10.0" percentHeight="08.0" />
             <RowConstraints minHeight="10.0" percentHeight="70.0" />
             <RowConstraints minHeight="10.0" percentHeight="20.0" />
         </rowConstraints>
@@ -38,7 +39,7 @@
             <ToggleSwitch GridPane.rowIndex="0" text="WebCam" fx:id="switchWebCam" onMousePressed="#onSwitchSelected" selected="false"/>
         </GridPane>
 
-        <GridPane GridPane.rowIndex="0" hgap="10" vgap="10" visible="${controller.enabledWebCam}">
+        <GridPane GridPane.rowIndex="1" hgap="10" vgap="10" visible="${controller.disabledWebCam}">
             <columnConstraints>
                 <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
                 <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
@@ -48,23 +49,14 @@
             <Text GridPane.columnIndex="1" id="lblPath" fx:id="textPath" text="Path :" />
         </GridPane>
 
-        <GridPane GridPane.rowIndex="0" hgap="10" vgap="10" visible="${controller.enabledWebCam}">
-            <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
-                <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
-            </columnConstraints>
-
-            <Text GridPane.columnIndex="1" id="lblPath" text="WebCam" />
-        </GridPane>
-
-        <GridPane GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.halignment="CENTER">
+        <GridPane GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.halignment="CENTER">
             <ImageView fx:id="imageView"
                        fitHeight="450"
                        pickOnBounds="true" preserveRatio="true"
             />
         </GridPane>
 
-        <GridPane GridPane.rowIndex="2" hgap="10" vgap="10" >
+        <GridPane GridPane.rowIndex="3" hgap="10" vgap="10" >
             <columnConstraints>
                 <ColumnConstraints minWidth="10.0" percentWidth="33.3" />
                 <ColumnConstraints minWidth="10.0" percentWidth="33.3" />
