@@ -34,16 +34,15 @@ public class SaveImage {
     /**
      * Write the picture of the information given
      * @param imageDescription The information from a picture
+     * @param bufferedImage The information from a picture
      */
-    public void save(ImageDescription imageDescription) {
+    public void save(ImageDescription imageDescription, BufferedImage bufferedImage) {
         List<String> listObjectsName = new ArrayList<>(Arrays.asList(this.objectsName.split(" ")));
 
         int percentage = Math.round(imageDescription.getProbability() * 100);
         if (percentage >= this.minPercentage  &&
             listObjectsName.contains(imageDescription.getLabel())) {
             try {
-                File newFile = new File(imageDescription.getPath());
-                BufferedImage bufferedImage = ImageIO.read(newFile);
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
                 LocalDateTime now = LocalDateTime.now();
                 String fileName = dtf.format(now) + "_" + this.objectsName + "_" + percentage + ".jpg";

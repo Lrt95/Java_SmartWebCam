@@ -1,28 +1,37 @@
 package fxmlController;
 
 import javafx.beans.property.*;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
-import org.controlsfx.control.ToggleSwitch;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.FrameGrabber;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.OpenCVFrameGrabber;
 import org.tensorflow.Tensor;
 
 import saveImage.SaveImage;
@@ -31,19 +40,13 @@ import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
 
+import javax.imageio.ImageIO;
+
 public class ApplicationController implements Initializable {
     @FXML
-    private ToggleSwitch switchWebCam;
+    private GridPane gridImage;
     @FXML
     private Text textPath;
-    @FXML
-    private Text textObject;
-    @FXML
-    private Text textIndex;
-    @FXML
-    private Text textProbability;
-    @FXML
-    private ImageView imageView;
     @FXML
     private TextField textFieldPictureName;
     @FXML
@@ -52,6 +55,8 @@ public class ApplicationController implements Initializable {
     private Text textPercentage;
     @FXML
     private Spinner<Integer> spinnerTime;
+
+    private final Java2DFrameConverter java2DFrameConverter = new Java2DFrameConverter();
 
     private final StringProperty folderSave;
 
@@ -74,7 +79,9 @@ public class ApplicationController implements Initializable {
         return this.disabledWebCam.get();
     }
 
-    public void setDisabledWebCam(boolean value) { this.disabledWebCam.set(value); }
+    public void setDisabledWebCam(boolean value) {
+        this.disabledWebCam.set(value);
+    }
 
     public BooleanProperty disabledWebCamProperty() {
         return this.disabledWebCam;
@@ -99,6 +106,7 @@ public class ApplicationController implements Initializable {
     private ArrayList<String> allLabels;
     private byte[] graphDef;
     private ImageDescription imageDescription;
+    private GridImageController gridImageController;
 
     private int percentage;
 
@@ -119,7 +127,11 @@ public class ApplicationController implements Initializable {
     }
 
     private int getSpinnerTime() {
-        return Integer.parseInt(this.spinnerTime.getValue().toString());
+        return Integer.parseInt(this.spinnerTime.getValue().toString()) * 1000;
+    }
+
+    public String getOS(){
+        return this.OS;
     }
 
     /**
@@ -132,16 +144,29 @@ public class ApplicationController implements Initializable {
         this.disabledWebCam = new SimpleBooleanProperty(true);
     }
 
+
     /**
      * Call after the controller was created.
-     * @param url Url
+     *
+     * @param url       Url
      * @param resources Resources
      */
     public void initialize(URL url, ResourceBundle resources) {
-        sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
-            percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
-            textPercentage.setText(percentage + " %");
+        this.sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
+            this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
+            this.textPercentage.setText(percentage + " %");
         });
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/fxml/imagePanel.fxml"));
+        try {
+            Parent children = loader.load();
+            this.gridImage.getChildren().add(children);
+            this.gridImageController = loader.<GridImageController>getController();
+            this.gridImageController.setOwner(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -157,25 +182,22 @@ public class ApplicationController implements Initializable {
      */
     private void checkCanSave() {
         setDisableSave(
-            folderSave.getValue() == null ||
-            getPictureName() == null ||
-            getPictureName().length() == 0 ||
-            imageDescription == null
+                folderSave.getValue() == null ||
+                        getPictureName() == null ||
+                        getPictureName().length() == 0 ||
+                        imageDescription == null
         );
     }
 
     /**
      * set description on application after the tensor result
+     *
      * @param imageDescription of the tensor result
      */
-    private void setImageDescription(ImageDescription imageDescription){
+    private void setImageDescription(ImageDescription imageDescription) {
         this.imageDescription = imageDescription;
-        this.textObject.setText(imageDescription != null ? "Object: " + this.imageDescription.getLabel() : "Object: ");
-        this.textIndex.setText(imageDescription != null ? "Index: " + this.imageDescription.getIndex() : "Index: ");
-        this.textProbability.setText(imageDescription != null ? "Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%" : "Probability: ");
         this.textPath.setText(imageDescription != null ? "Path: " + this.imageDescription.getPath() : "Path: ");
-        String separator = OS.contains("win") ? "/" : "//";
-        this.imageView.setImage(imageDescription != null ? new Image("file:" + separator + this.imageDescription.getPath()) : null);
+        this.gridImageController.setDescription(this.imageDescription);
         checkPictureName();
         checkCanSave();
     }
@@ -184,6 +206,7 @@ public class ApplicationController implements Initializable {
      * EventHandler of the button "Select Picture"
      * <p>
      * Select a file and get it to TensorFlow and the data.
+     *
      * @param event The event given by the sender
      * @throws IOException if file not exists
      */
@@ -201,9 +224,12 @@ public class ApplicationController implements Initializable {
     }
 
     @FXML
-    private void onSwitchSelected(MouseEvent event) {
-        this.setDisabledWebCam(!getDisabledWebCam());
+    private void onSwitchSelected(MouseEvent event) throws FrameGrabber.Exception {
         this.resetAfterToggle();
+        this.setDisabledWebCam(!this.getDisabledWebCam());
+        if (!this.getDisabledWebCam()) {
+            this.setCam();
+        }
     }
 
     private void resetAfterToggle() {
@@ -212,6 +238,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Select a file with a chooser window
+     *
      * @return The selected file
      */
     private File openFile() {
@@ -228,6 +255,7 @@ public class ApplicationController implements Initializable {
      * EventHandler of the button "Select Save Folder"
      * <p>
      * Select a folder to save the picture.
+     *
      * @param event The event given by the sender
      */
     @FXML
@@ -241,6 +269,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Select a folder with a chooser window
+     *
      * @return The selected folder
      */
     private File openDirectory() {
@@ -252,21 +281,95 @@ public class ApplicationController implements Initializable {
 
     /**
      * Save the picture to the save folder selected
+     *
      * @param event The event raise by the sender
      */
     @FXML
     private void handleButtonSave(ActionEvent event) {
         checkPictureName();
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(this.gridImageController.getImageView().getImage(), null);
         SaveImage saveImage = new SaveImage(this.percentage, getPictureName(), folderSave.getValue());
-        saveImage.save(this.imageDescription);
+        saveImage.save(this.imageDescription, bufferedImage);
     }
 
     /**
      * EventHandler on KeyPress on the TextField of PictureName
+     *
      * @param keyEvent The event raise by the sender
      */
     @FXML
     private void pictureNameKeyPressed(KeyEvent keyEvent) {
         checkCanSave();
     }
+
+    @FXML
+    private void setCam() throws FrameGrabber.Exception {
+        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(2);
+
+
+
+            grabber.start();
+            Executors.newSingleThreadExecutor().execute(() -> {
+                Frame frame;
+                while (!this.getDisabledWebCam()) {
+                    try {
+                        frame = grabber.grabFrame();
+                        setFrameToImageView(frame);
+                    } catch (FrameGrabber.Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    grabber.stop();
+                } catch (FrameGrabber.Exception e) {
+                    e.printStackTrace();
+                }
+                this.resetAfterToggle();
+            });
+
+    }
+
+    private void setFrameToImageView(Frame frame) {
+        try {
+            Thread.sleep(this.getSpinnerTime());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.gridImageController.getImageView().setImage(frameToImage(frame));
+    }
+
+    private WritableImage frameToImage(Frame frame) {
+        BufferedImage bufferedImage = java2DFrameConverter.getBufferedImage(frame);
+        try {
+            this.setDescriptionCam(bufferedImage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+
+    private void setDescriptionCam(BufferedImage bufferedImage) throws IOException {
+
+        byte[] bytes = toByteArray(bufferedImage, "jpg");
+
+
+        TensorFlowUtils tensorFlowUtils = new TensorFlowUtils();
+        Tensor<Float> tensor = tensorFlowUtils.executeModelFromByteArray(
+                this.graphDef,
+                tensorFlowUtils.byteBufferToTensor(bytes)
+        );
+        setImageDescription(tensorFlowUtils.getDescription(null, tensor, this.allLabels));
+    }
+
+    // convert BufferedImage to byte[]
+    public static byte[] toByteArray(BufferedImage bufferedImage, String format)
+            throws IOException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, format, baos);
+        byte[] bytes = baos.toByteArray();
+        return bytes;
+
+    }
+
 }
