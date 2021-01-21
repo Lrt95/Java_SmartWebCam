@@ -170,12 +170,12 @@ public class ApplicationController implements Initializable {
      */
     private void setImageDescription(ImageDescription imageDescription){
         this.imageDescription = imageDescription;
-        this.textObject.setText("Object: " + this.imageDescription.getLabel());
-        this.textIndex.setText("Index: " + this.imageDescription.getIndex());
-        this.textProbability.setText("Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%");
-        this.textPath.setText("Path: " + this.imageDescription.getPath());
+        this.textObject.setText(imageDescription != null ? "Object: " + this.imageDescription.getLabel() : "Object: ");
+        this.textIndex.setText(imageDescription != null ? "Index: " + this.imageDescription.getIndex() : "Index: ");
+        this.textProbability.setText(imageDescription != null ? "Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%" : "Probability: ");
+        this.textPath.setText(imageDescription != null ? "Path: " + this.imageDescription.getPath() : "Path: ");
         String separator = OS.contains("win") ? "/" : "//";
-        this.imageView.setImage(new Image("file:" + separator + this.imageDescription.getPath()));
+        this.imageView.setImage(imageDescription != null ? new Image("file:" + separator + this.imageDescription.getPath()) : null);
         checkPictureName();
         checkCanSave();
     }
@@ -203,6 +203,11 @@ public class ApplicationController implements Initializable {
     @FXML
     private void onSwitchSelected(MouseEvent event) {
         this.setDisabledWebCam(!getDisabledWebCam());
+        this.resetAfterToggle();
+    }
+
+    private void resetAfterToggle() {
+        this.setImageDescription(null);
     }
 
     /**
