@@ -35,6 +35,7 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameGrabber;
+import org.controlsfx.control.ToggleSwitch;
 import org.tensorflow.Tensor;
 
 import saveImage.SaveImage;
@@ -47,11 +48,11 @@ import javax.imageio.ImageIO;
 
 public class ApplicationController implements Initializable {
     @FXML
-    private GridPane gridImage;
+    public ToggleSwitch toggleSwitchWebCam;
     @FXML
     private Text textPath;
     @FXML
-    private TextField textFieldPictureName;
+    private GridPane gridImage;
     @FXML
     private Slider sliderPercentage;
     @FXML
@@ -164,6 +165,14 @@ public class ApplicationController implements Initializable {
         this.comboBoxLabelsAvailable.valueProperty().addListener((observable, oldValue, newValue) -> addSelectedLabel(newValue));
         this.comboBoxLabelsSelected.valueProperty().addListener(((observable, oldValue, newValue) -> removeSelectedLabel(newValue)));
 
+        this.toggleSwitchWebCam.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                onToggleClick();
+            }
+            catch (FrameGrabber.Exception ignored) {}
+
+        });
+
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/imagePanel.fxml"));
         try {
@@ -174,9 +183,7 @@ public class ApplicationController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 
     /**
      * Check if the user can save the image.
@@ -221,16 +228,22 @@ public class ApplicationController implements Initializable {
         }
     }
 
-    @FXML
-    private void onSwitchSelected(MouseEvent event) throws FrameGrabber.Exception {
-        this.resetAfterToggle();
+    /**
+     * Call when the WebCam toggle is clicked
+     * @throws FrameGrabber.Exception if device not found
+     */
+    private void onToggleClick() throws FrameGrabber.Exception {
+        this.resetImageDescription();
         this.setDisabledWebCam(!this.getDisabledWebCam());
         if (!this.getDisabledWebCam()) {
             this.gridImageController.setCam();
         }
     }
 
-    public void resetAfterToggle() {
+    /**
+     * Reset image description
+     */
+    private void resetImageDescription() {
         this.setImageDescription(null);
     }
 
@@ -284,6 +297,9 @@ public class ApplicationController implements Initializable {
         saveImage.save(this.imageDescription, bufferedImage);
     }
 
+    /**
+     * Feed the comboBox of the available labels.
+     */
     private void fetchAvailableLabels() {
         String filter = this.comboBoxLabelsAvailable.getEditor().getText();
         this.comboBoxLabelsAvailable.getItems().clear();
@@ -294,6 +310,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Add a label in the SelectedLabels List
+     * @param label The new label to add
+     */
     private void addSelectedLabel(String label) {
         if (label != null && label.length() > 0 && !this.allLabelsSelected.contains(label)) {
             this.allLabelsSelected.add(label);
@@ -302,6 +322,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Remove a label from the SelectedLabels List
+     * @param label The label to remove
+     */
     private void removeSelectedLabel(String label) {
         if (label != null && label.length() > 0) {
             this.allLabelsSelected.remove(label);
@@ -310,6 +334,9 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Feed the comboBox of the selected labels.
+     */
     private void fetchSelectedLabels() {
         this.comboBoxLabelsSelected.getItems().clear();
         this.allLabelsSelected.sort(String::compareToIgnoreCase);
