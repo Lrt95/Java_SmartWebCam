@@ -67,6 +67,8 @@ public class TensorFlowUtils {
                             graphBuilder.constant("scale", scale));
             try (Session s = new Session(g)) {
                 return s.runner().fetch(output.op().name()).run().get(0).expect(Float.class);
+            } catch (IllegalArgumentException e) {
+                return null;
             }
         }
     }

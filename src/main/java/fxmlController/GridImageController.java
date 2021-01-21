@@ -56,29 +56,29 @@ public class GridImageController {
         grabber.start();
 
         Executors.newSingleThreadExecutor().execute(() -> {
-            boolean alreadyExecuted = false;
             Frame frame;
             while (!this.owner.getDisabledWebCam()) {
                 try {
                     frame = grabber.grabFrame();
                     setFrameToImageView(frame);
-                    if(!alreadyExecuted && frame.image.length > 5) {
-                        setDescriptionCam();
-                        alreadyExecuted = true;
-                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
             try {
                 grabber.stop();
+                grabber.close();
 
             } catch (FrameGrabber.Exception e) {
                 e.printStackTrace();
             }
             this.owner.resetImageDescription();
         });
-
+        try {
+            this.setDescriptionCam();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setFrameToImageView(Frame frame) {
@@ -92,20 +92,25 @@ public class GridImageController {
 
     private void setDescriptionCam() throws IOException {
         Executors.newSingleThreadExecutor().execute(() -> {
+            TensorFlowUtils tensorFlowUtils = new TensorFlowUtils();
             while (!this.owner.getDisabledWebCam()) {
                 try {
                     Thread.sleep(this.owner.getSpinnerTime());
                     BufferedImage bufferedImage = SwingFXUtils.fromFXImage(this.getImageView().getImage(), null);
-
+                    System.out.println("hello1");
                     byte[] bytes = toByteArray(bufferedImage, "jpg");
-
-
-                    TensorFlowUtils tensorFlowUtils = new TensorFlowUtils();
+                    Tensor<Float> tensor2 =  tensorFlowUtils.byteBufferToTensor(bytes);
+                    System.out.println("hello2");
+                    if (tensor2 == null) {
+                        System.out.println("hello3");
+                        continue;
+                    }
                     Tensor<Float> tensor = tensorFlowUtils.executeModelFromByteArray(
                             this.owner.graphDef,
-                            tensorFlowUtils.byteBufferToTensor(bytes)
+                            tensor2
                     );
-                    this.owner.setImageDescription(tensorFlowUtils.getDescription(null, tensor, this.owner.allLabels));
+                    System.out.println("hello4");
+                    this.setDescription(tensorFlowUtils.getDescription(null, tensor, this.owner.allLabels));
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
