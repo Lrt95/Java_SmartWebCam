@@ -10,6 +10,8 @@ import javafx.scene.text.Text;
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
+import java.awt.*;
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -21,11 +23,16 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameGrabber;
+
+
 import org.tensorflow.Tensor;
 
 import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
+
+import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
+
 
 public class GridImageController implements Initializable {
     @FXML
@@ -89,7 +96,7 @@ public class GridImageController implements Initializable {
      * @throws FrameGrabber.Exception if the device was not found
      */
     public void setCam() throws FrameGrabber.Exception {
-        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
+        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(2);
         grabber.start();
 
         timerDelay = this.owner.getSpinnerTime();
@@ -141,7 +148,12 @@ public class GridImageController implements Initializable {
      */
     private WritableImage frameToImage(Frame frame) {
         BufferedImage bufferedImage = java2DFrameConverter.getBufferedImage(frame);
-        return SwingFXUtils.toFXImage(bufferedImage, null);
+        try {
+            return SwingFXUtils.toFXImage(applyCadreFilter(bufferedImage), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return  SwingFXUtils.toFXImage(bufferedImage, null);
+        }
     }
 
     /**
@@ -172,5 +184,16 @@ public class GridImageController implements Initializable {
         try { ImageIO.write(bufferedImage, format, baos); }
         catch (IOException ignored) { return null; }
         return baos.toByteArray();
+    }
+
+    private BufferedImage applyCadreFilter(BufferedImage bufferedImage) throws IOException {
+        BufferedImage cadreBuffered = ImageIO.read(new File("src/main/resources/images/cadre.png"));
+        Graphics2D g2d = bufferedImage.createGraphics();
+        g2d.setComposite(AlphaComposite.SrcOver.derive(0.5f));
+        int x = (bufferedImage.getWidth() - cadreBuffered.getWidth()) / 2;
+        int y = (bufferedImage.getHeight() - cadreBuffered.getHeight()) / 2;
+        g2d.drawImage(cadreBuffered, x, y, null);
+        g2d.dispose();
+        return bufferedImage;
     }
 }
