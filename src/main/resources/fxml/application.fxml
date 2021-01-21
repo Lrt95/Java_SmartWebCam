@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.text.Text?>
 <?import javafx.collections.FXCollections?>
 
@@ -49,12 +48,7 @@
             <Text GridPane.columnIndex="1" id="lblPath" fx:id="textPath" text="Path :" />
         </GridPane>
 
-        <GridPane fx:id="gridImage" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.halignment="CENTER">
-<!--            <ImageView fx:id="imageView"-->
-<!--                       fitHeight="450"-->
-<!--                       pickOnBounds="true" preserveRatio="true"-->
-<!--            />-->
-        </GridPane>
+        <GridPane fx:id="gridImage" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.halignment="CENTER"/>
 
     </GridPane>
 
@@ -93,9 +87,6 @@
             </rowConstraints>
 
             <Text text="Name : " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="textFieldPictureName" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                       onKeyPressed="#pictureNameKeyPressed" />
-
             <GridPane GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2" >
                 <columnConstraints>
                     <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
