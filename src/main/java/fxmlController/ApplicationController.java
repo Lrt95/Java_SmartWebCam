@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.controlsfx.control.ToggleSwitch;
 import org.tensorflow.Tensor;
 
 import saveImage.SaveImage;
@@ -30,7 +32,8 @@ import utils.TensorFlowUtils;
 import utils.Utils;
 
 public class ApplicationController implements Initializable {
-
+    @FXML
+    private ToggleSwitch switchWebCam;
     @FXML
     private Text textPath;
     @FXML
@@ -63,6 +66,18 @@ public class ApplicationController implements Initializable {
 
     public StringProperty folderSaveProperty() {
         return folderSave;
+    }
+
+    private final BooleanProperty enableWebCam;
+
+    public boolean getEnabledWebCam() {
+        return this.enableWebCam.get();
+    }
+
+    public void setEnabledWebCam(boolean value) { this.enableWebCam.set(value); }
+
+    public BooleanProperty enableWebCamProperty() {
+        return this.enableWebCam;
     }
 
     private final BooleanProperty disableSave;
@@ -112,8 +127,9 @@ public class ApplicationController implements Initializable {
      */
     public ApplicationController() {
         this.OS = System.getProperty("os.name").toLowerCase();
-        folderSave = new SimpleStringProperty(null);
-        disableSave = new SimpleBooleanProperty(true);
+        this.folderSave = new SimpleStringProperty(null);
+        this.disableSave = new SimpleBooleanProperty(true);
+        this.enableWebCam = new SimpleBooleanProperty(false);
     }
 
     /**
@@ -132,7 +148,7 @@ public class ApplicationController implements Initializable {
      * Remove the double spaces in the textField of PictureName
      */
     private void checkPictureName() {
-        this.textFieldPictureName.setText(this.textFieldPictureName.getText().replaceAll("  ", " ").trim());
+        this.textFieldPictureName.setText(this.textFieldPictureName.getText().replaceAll(" ", " ").trim());
     }
 
     /**
@@ -182,6 +198,13 @@ public class ApplicationController implements Initializable {
             );
             setImageDescription(tensorFlowUtils.getDescription(file.getPath(), tensor, this.allLabels));
         }
+    }
+
+    @FXML
+    private void onSwitchSelected(MouseEvent event) {
+        this.setEnabledWebCam(!getEnabledWebCam());
+        System.out.println(this.enableWebCam);
+
     }
 
     /**
