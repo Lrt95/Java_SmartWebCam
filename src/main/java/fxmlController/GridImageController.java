@@ -7,7 +7,6 @@ import javafx.scene.text.Text;
 import utils.ImageDescription;
 import utils.Utils;
 
-
 public class GridImageController {
     @FXML
     private Text textProbability;

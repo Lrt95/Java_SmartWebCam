@@ -28,17 +28,25 @@
             <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints minHeight="10.0" percentHeight="02.0" />
-            <RowConstraints minHeight="10.0" percentHeight="08.0" />
-            <RowConstraints minHeight="10.0" percentHeight="70.0" />
-            <RowConstraints minHeight="10.0" percentHeight="20.0" />
+            <RowConstraints minHeight="10.0" percentHeight="03.0" />
+            <RowConstraints minHeight="10.0" percentHeight="10.0" />
+            <RowConstraints minHeight="10.0" percentHeight="87.0" />
         </rowConstraints>
 
-        <GridPane GridPane.rowIndex="0" hgap="10" vgap="10">
-            <ToggleSwitch GridPane.rowIndex="0" text="WebCam" onMousePressed="#onSwitchSelected" selected="false"/>
+        <GridPane GridPane.rowIndex="0" hgap="10" vgap="10" >
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="100.0" />
+            </rowConstraints>
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
+            </columnConstraints>
+            <ToggleSwitch GridPane.rowIndex="0" text="WebCam" fx:id="toggleSwitchWebCam" selected="false"/>
         </GridPane>
 
         <GridPane GridPane.rowIndex="1" hgap="10" vgap="10" visible="${controller.disabledWebCam}">
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="100.0" />
+            </rowConstraints>
             <columnConstraints>
                 <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
                 <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
@@ -62,6 +70,9 @@
         </rowConstraints>
 
         <GridPane GridPane.rowIndex="0" hgap="10" vgap="10">
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="100.0" />
+            </rowConstraints>
             <columnConstraints>
                 <ColumnConstraints minWidth="10.0" percentWidth="30.0" />
                 <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
@@ -88,6 +99,9 @@
 
             <Text text="Name : " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
             <GridPane GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2" >
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="100.0" />
+                </rowConstraints>
                 <columnConstraints>
                     <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
                     <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
@@ -108,6 +122,9 @@
 
             <Text text="Percentage : " GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
             <GridPane GridPane.rowIndex="1" GridPane.columnIndex="1" >
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="100.0" />
+                </rowConstraints>
                 <columnConstraints>
                     <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
                     <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
@@ -128,8 +145,6 @@
                     onAction="#handleButtonSave" disable="${controller.disableSave}"
                     GridPane.rowIndex="3"
             />
-
         </GridPane>
     </GridPane>
-
 </GridPane>
