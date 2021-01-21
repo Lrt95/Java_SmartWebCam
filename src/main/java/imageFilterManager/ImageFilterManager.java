@@ -95,29 +95,44 @@ public class ImageFilterManager {
         return this.red + "," + this.green + "," + this.blue + "," + this.alpha;
     }
 
-    public BufferedImage applyFilters(BufferedImage bufferedImage) throws IOException {
+    public void applyFilters(BufferedImage bufferedImage) throws IOException {
         if (this.isFilterColorApply) {
-
+            applyColorFilter(bufferedImage);
         }
         if (this.isFilterBorderApply) {
-            applyCadreFilter(bufferedImage);
+            applyBorderFilter(bufferedImage);
         }
         if (this.isFilterPictureApply){
-
+            applyPictureFilter(bufferedImage);
         }
-
-        return bufferedImage;
     }
 
-    private void applyCadreFilter(BufferedImage bufferedImage) throws IOException {
+    private void applyColorFilter(BufferedImage bufferedImage) {
+        BufferedImage bImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        Color color = new Color(this.red, this.green, this.blue);
+
+        for (int i = 0; i < bImage.getHeight(); i++) {
+            for (int j = 0; j < bImage.getWidth(); j++) {
+                bImage.setRGB(j, i, color.getRGB());
+            }
+        }
+        mergeBufferedImage(bufferedImage, bImage, (float)this.alpha / 255);
+    }
+
+    private void applyBorderFilter(BufferedImage bufferedImage) throws IOException {
         BufferedImage cadreBuffered = ImageIO.read(new File("src/main/resources/images/cadre.png"));
-        mergeBufferedImage(bufferedImage, cadreBuffered);
+        mergeBufferedImage(bufferedImage, cadreBuffered, 1f);
     }
 
-    private void mergeBufferedImage(BufferedImage bufferedImage, BufferedImage cadreBuffered) {
+    private void applyPictureFilter(BufferedImage bufferedImage) {
+
+    }
+
+    private void mergeBufferedImage(BufferedImage bufferedImage, BufferedImage cadreBuffered, float alpha) {
         BufferedImage cadreResize = resize(cadreBuffered, bufferedImage.getWidth(), bufferedImage.getHeight());
         Graphics2D g2d = bufferedImage.createGraphics();
-        g2d.setComposite(AlphaComposite.SrcOver.derive(1f));
+        g2d.setComposite(AlphaComposite.SrcOver.derive(alpha));
         int x = (bufferedImage.getWidth() - cadreResize.getWidth()) / 2;
         int y = (bufferedImage.getHeight() - cadreResize.getHeight()) / 2;
 

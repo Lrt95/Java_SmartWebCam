@@ -115,7 +115,7 @@ public class GridImageController implements Initializable {
      * @throws FrameGrabber.Exception if the device was not found
      */
     public void setCam() throws FrameGrabber.Exception {
-        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(2);
+        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
         grabber.start();
 
         timerDelay = this.owner.getSpinnerTime();
