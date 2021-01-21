@@ -4,6 +4,7 @@ import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
@@ -52,6 +53,10 @@ public class ApplicationController implements Initializable {
     private Text textPercentage;
     @FXML
     private Spinner<Integer> spinnerTime;
+    @FXML
+    private ComboBox<String> comboBoxLabelsAvailable;
+    @FXML
+    private ComboBox<String> comboBoxLabelsSelected;
 
     private final StringProperty folderSave;
 
@@ -108,6 +113,7 @@ public class ApplicationController implements Initializable {
 
     public void setAllLabels(ArrayList<String> value) {
         this.allLabels = value;
+        fetchAvailableLabels();
     }
 
     public void setGraphDef(byte[] value) {
@@ -138,9 +144,13 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL url, ResourceBundle resources) {
-        sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
-            percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
-            textPercentage.setText(percentage + " %");
+        this.sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
+            this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
+            this.textPercentage.setText(this.percentage + " %");
+        });
+        this.textFieldPictureName.textProperty().addListener((observable, oldValue, newValue) -> {
+            fetchAvailableLabels();
+            checkCanSave();
         });
     }
 
@@ -267,6 +277,15 @@ public class ApplicationController implements Initializable {
      */
     @FXML
     private void pictureNameKeyPressed(KeyEvent keyEvent) {
-        checkCanSave();
+    }
+
+    private void fetchAvailableLabels() {
+        this.comboBoxLabelsAvailable.getItems().clear();
+        String filter = getPictureName();
+        for (String label: this.allLabels) {
+            if (label.startsWith(filter)) {
+                this.comboBoxLabelsAvailable.getItems().add(label);
+            }
+        }
     }
 }
