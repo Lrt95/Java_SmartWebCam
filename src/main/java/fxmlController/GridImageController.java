@@ -188,12 +188,25 @@ public class GridImageController implements Initializable {
 
     private BufferedImage applyCadreFilter(BufferedImage bufferedImage) throws IOException {
         BufferedImage cadreBuffered = ImageIO.read(new File("src/main/resources/images/cadre.png"));
+        BufferedImage cadreResize = this.resize(cadreBuffered, bufferedImage.getWidth(), bufferedImage.getHeight());
         Graphics2D g2d = bufferedImage.createGraphics();
-        g2d.setComposite(AlphaComposite.SrcOver.derive(0.5f));
-        int x = (bufferedImage.getWidth() - cadreBuffered.getWidth()) / 2;
-        int y = (bufferedImage.getHeight() - cadreBuffered.getHeight()) / 2;
-        g2d.drawImage(cadreBuffered, x, y, null);
+        g2d.setComposite(AlphaComposite.SrcOver.derive(1f));
+        int x = (bufferedImage.getWidth() - cadreResize.getWidth()) / 2;
+        int y = (bufferedImage.getHeight() - cadreResize.getHeight()) / 2;
+
+        g2d.drawImage(cadreResize, x, y, null);
         g2d.dispose();
         return bufferedImage;
+    }
+
+    public static BufferedImage resize(BufferedImage img, int newW, int newH) {
+        java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
+        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = dimg.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+
+        return dimg;
     }
 }
