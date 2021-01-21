@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.controlsfx.control.ToggleSwitch;
 import org.tensorflow.Tensor;
 
 import saveImage.SaveImage;
@@ -30,7 +32,8 @@ import utils.TensorFlowUtils;
 import utils.Utils;
 
 public class ApplicationController implements Initializable {
-
+    @FXML
+    private ToggleSwitch switchWebCam;
     @FXML
     private Text textPath;
     @FXML
@@ -63,6 +66,18 @@ public class ApplicationController implements Initializable {
 
     public StringProperty folderSaveProperty() {
         return folderSave;
+    }
+
+    private final BooleanProperty disabledWebCam;
+
+    public boolean getDisabledWebCam() {
+        return this.disabledWebCam.get();
+    }
+
+    public void setDisabledWebCam(boolean value) { this.disabledWebCam.set(value); }
+
+    public BooleanProperty disabledWebCamProperty() {
+        return this.disabledWebCam;
     }
 
     private final BooleanProperty disableSave;
@@ -112,8 +127,9 @@ public class ApplicationController implements Initializable {
      */
     public ApplicationController() {
         this.OS = System.getProperty("os.name").toLowerCase();
-        folderSave = new SimpleStringProperty(null);
-        disableSave = new SimpleBooleanProperty(true);
+        this.folderSave = new SimpleStringProperty(null);
+        this.disableSave = new SimpleBooleanProperty(true);
+        this.disabledWebCam = new SimpleBooleanProperty(true);
     }
 
     /**
@@ -132,7 +148,7 @@ public class ApplicationController implements Initializable {
      * Remove the double spaces in the textField of PictureName
      */
     private void checkPictureName() {
-        this.textFieldPictureName.setText(this.textFieldPictureName.getText().replaceAll("  ", " ").trim());
+        this.textFieldPictureName.setText(this.textFieldPictureName.getText().replaceAll(" ", " ").trim());
     }
 
     /**
@@ -154,12 +170,12 @@ public class ApplicationController implements Initializable {
      */
     private void setImageDescription(ImageDescription imageDescription){
         this.imageDescription = imageDescription;
-        this.textObject.setText("Object: " + this.imageDescription.getLabel());
-        this.textIndex.setText("Index: " + this.imageDescription.getIndex());
-        this.textProbability.setText("Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%");
-        this.textPath.setText("Path: " + this.imageDescription.getPath());
+        this.textObject.setText(imageDescription != null ? "Object: " + this.imageDescription.getLabel() : "Object: ");
+        this.textIndex.setText(imageDescription != null ? "Index: " + this.imageDescription.getIndex() : "Index: ");
+        this.textProbability.setText(imageDescription != null ? "Probability: " + Utils.round(this.imageDescription.getProbability() * 100, 2)+ "%" : "Probability: ");
+        this.textPath.setText(imageDescription != null ? "Path: " + this.imageDescription.getPath() : "Path: ");
         String separator = OS.contains("win") ? "/" : "//";
-        this.imageView.setImage(new Image("file:" + separator + this.imageDescription.getPath()));
+        this.imageView.setImage(imageDescription != null ? new Image("file:" + separator + this.imageDescription.getPath()) : null);
         checkPictureName();
         checkCanSave();
     }
@@ -182,6 +198,16 @@ public class ApplicationController implements Initializable {
             );
             setImageDescription(tensorFlowUtils.getDescription(file.getPath(), tensor, this.allLabels));
         }
+    }
+
+    @FXML
+    private void onSwitchSelected(MouseEvent event) {
+        this.setDisabledWebCam(!getDisabledWebCam());
+        this.resetAfterToggle();
+    }
+
+    private void resetAfterToggle() {
+        this.setImageDescription(null);
     }
 
     /**
