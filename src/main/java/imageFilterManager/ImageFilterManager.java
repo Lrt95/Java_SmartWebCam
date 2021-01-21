@@ -1,6 +1,12 @@
 package imageFilterManager;
 
-public class imageFilterManager {
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+public class ImageFilterManager {
 
     private int red;
     private int green;
@@ -11,7 +17,7 @@ public class imageFilterManager {
     private boolean isFilterBorderApply;
     private boolean isFilterPictureApply;
 
-    public imageFilterManager(int red, int green, int blue, int alpha) {
+    public ImageFilterManager(int red, int green, int blue, int alpha) {
         this.isFilterColorApply = false;
         this.isFilterBorderApply = false;
         this.isFilterPictureApply = false;
@@ -87,5 +93,46 @@ public class imageFilterManager {
 
     public String getColor() {
         return this.red + "," + this.green + "," + this.blue + "," + this.alpha;
+    }
+
+    public BufferedImage applyFilters(BufferedImage bufferedImage) throws IOException {
+        if (this.isFilterColorApply) {
+
+        }
+        if (this.isFilterBorderApply) {
+            applyCadreFilter(bufferedImage);
+        }
+        if (this.isFilterPictureApply){
+
+        }
+
+        return bufferedImage;
+    }
+
+    private void applyCadreFilter(BufferedImage bufferedImage) throws IOException {
+        BufferedImage cadreBuffered = ImageIO.read(new File("src/main/resources/images/cadre.png"));
+        mergeBufferedImage(bufferedImage, cadreBuffered);
+    }
+
+    private void mergeBufferedImage(BufferedImage bufferedImage, BufferedImage cadreBuffered) {
+        BufferedImage cadreResize = resize(cadreBuffered, bufferedImage.getWidth(), bufferedImage.getHeight());
+        Graphics2D g2d = bufferedImage.createGraphics();
+        g2d.setComposite(AlphaComposite.SrcOver.derive(1f));
+        int x = (bufferedImage.getWidth() - cadreResize.getWidth()) / 2;
+        int y = (bufferedImage.getHeight() - cadreResize.getHeight()) / 2;
+
+        g2d.drawImage(cadreResize, x, y, null);
+        g2d.dispose();
+    }
+
+    private static BufferedImage resize(BufferedImage img, int newW, int newH) {
+        java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
+        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = dimg.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+
+        return dimg;
     }
 }

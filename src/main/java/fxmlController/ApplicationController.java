@@ -35,7 +35,7 @@ import utils.TensorFlowUtils;
 import utils.Utils;
 
 import saveImage.SaveImage;
-import imageFilterManager.imageFilterManager;
+import imageFilterManager.ImageFilterManager;
 
 public class ApplicationController implements Initializable {
     @FXML
@@ -122,11 +122,19 @@ public class ApplicationController implements Initializable {
         return this.disableFilterEdition;
     }
 
+    public ImageDescription getImageDescription() {
+        return imageDescription;
+    }
+
+    public HashMap<String, ImageFilterManager> getLabelFilters() {
+        return labelFilters;
+    }
+
     private final String OS;
     private Stage owner;
     public ArrayList<String> allLabels;
     private final ArrayList<String> allLabelsSelected;
-    private final HashMap<String, imageFilterManager> labelFilters;
+    private final HashMap<String, ImageFilterManager> labelFilters;
     public byte[] graphDef;
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
@@ -159,7 +167,7 @@ public class ApplicationController implements Initializable {
      */
     public ApplicationController() {
         this.OS = System.getProperty("os.name").toLowerCase();
-        this.labelFilters = new HashMap<String, imageFilterManager>();
+        this.labelFilters = new HashMap<String, ImageFilterManager>();
         this.folderSave = new SimpleStringProperty(null);
         this.disableSave = new SimpleBooleanProperty(true);
         this.disabledWebCam = new SimpleBooleanProperty(true);
@@ -191,9 +199,9 @@ public class ApplicationController implements Initializable {
         //this.comboBoxFilter.getEditor().textProperty().addListener((observable, oldValue, newValue) -> fetchFilters());
         this.comboBoxFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                imageFilterManager manager;
+                ImageFilterManager manager;
                 if (!this.labelFilters.containsKey(newValue)) {
-                    this.labelFilters.put(newValue, new imageFilterManager(0, 0, 0, 255));
+                    this.labelFilters.put(newValue, new ImageFilterManager(0, 0, 0, 255));
                 }
                 manager = this.labelFilters.get(newValue);
                 setDisableFilterEdition(false);
@@ -211,25 +219,25 @@ public class ApplicationController implements Initializable {
         });
         this.toggleApplyFilterColor.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!getDisableFilterEdition()) {
-                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
                 manager.setIsFilterColorApply(!manager.getIsFilterColorApply());
             }
         });
         this.toggleApplyFilterPicture.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!getDisableFilterEdition()) {
-                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
                 manager.setIsFilterPictureApply(!manager.getIsFilterPictureApply());
             }
         });
         this.toggleApplyFilterBorder.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!getDisableFilterEdition()) {
-                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
                 manager.setIsFilterBorderApply(!manager.getIsFilterBorderApply());
             }
         });
         this.textFieldColorFilter.textProperty().addListener(((observable, oldValue, newValue) -> {
             if (!getDisableFilterEdition()) {
-                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
                 manager.setFromString(newValue);
                 if (!manager.getColor().equals(newValue)) {
                     this.textFieldColorFilter.setText(manager.getColor());
@@ -370,11 +378,8 @@ public class ApplicationController implements Initializable {
      */
     @FXML
     private void handleButtonSave(ActionEvent event) {
-        BufferedImage bufferedImage = getDisabledWebCam() ?
-                SwingFXUtils.fromFXImage(this.gridImageController.getImageView().getImage(), null) :
-                new Java2DFrameConverter().getBufferedImage(this.gridImageController.getFrame());
         SaveImage saveImage = new SaveImage(this.percentage, this.allLabelsSelected, folderSave.getValue());
-        saveImage.save(this.imageDescription, bufferedImage);
+        saveImage.save(this.imageDescription, this.gridImageController.getLastBufferedImage());
     }
 
     /**

@@ -1,5 +1,6 @@
 package fxmlController;
 
+import imageFilterManager.ImageFilterManager;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,9 +11,9 @@ import javafx.scene.text.Text;
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
-import java.awt.*;
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.awt.image.BufferedImage;
@@ -44,6 +45,8 @@ public class GridImageController implements Initializable {
     @FXML
     private ImageView imageView;
 
+
+    private BufferedImage lastBufferedImage;
     private Frame frame;
     private ApplicationController owner;
     private final Java2DFrameConverter java2DFrameConverter = new Java2DFrameConverter();
@@ -51,6 +54,7 @@ public class GridImageController implements Initializable {
     private final TensorFlowUtils tensorFlowUtils;
     private Timer timerCamDescription;
     private int timerDelay;
+
 
     public void setOwner(ApplicationController owner) {
         this.owner = owner;
@@ -62,6 +66,14 @@ public class GridImageController implements Initializable {
 
     public ImageView getImageView() {
         return this.imageView;
+    }
+
+    public BufferedImage getLastBufferedImage() {
+        return lastBufferedImage;
+    }
+
+    private void setLastBufferedImage(BufferedImage lastBufferedImage) {
+        this.lastBufferedImage = lastBufferedImage;
     }
 
     /**
@@ -87,8 +99,15 @@ public class GridImageController implements Initializable {
         this.textObject.setText(imageDescription != null ? "Object: " + imageDescription.getLabel() : "Object: ");
         this.textIndex.setText(imageDescription != null ? "Index: " + imageDescription.getIndex() : "Index: ");
         this.textProbability.setText(imageDescription != null ? "Probability: " + Utils.round(imageDescription.getProbability() * 100, 2) + "%" : "Probability: ");
-        String separator = this.owner.getOS().contains("win") ? "/" : "//";
-        this.imageView.setImage(imageDescription != null ? new Image("file:" + separator + imageDescription.getPath()) : null);
+        if (this.owner.getDisabledWebCam() && imageDescription != null) {
+            try {
+                BufferedImage bufferedImage = ImageIO.read(new File(imageDescription.getPath()));
+                buildImage(bufferedImage, imageDescription);
+                this.imageView.setImage(SwingFXUtils.toFXImage(bufferedImage , null));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -148,11 +167,24 @@ public class GridImageController implements Initializable {
      */
     private WritableImage frameToImage(Frame frame) {
         BufferedImage bufferedImage = java2DFrameConverter.getBufferedImage(frame);
-        try {
-            return SwingFXUtils.toFXImage(applyCadreFilter(bufferedImage), null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return  SwingFXUtils.toFXImage(bufferedImage, null);
+        ImageDescription imageDescription = this.owner.getImageDescription();
+        buildImage(bufferedImage, imageDescription);
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+
+    private void buildImage(BufferedImage bufferedImage, ImageDescription imageDescription) {
+        if (imageDescription != null) {
+            HashMap<String , ImageFilterManager> allFilters = this.owner.getLabelFilters();
+            if (!allFilters.containsKey(imageDescription.getLabel())) {
+                allFilters.put(imageDescription.getLabel(), new ImageFilterManager(0,0,0,255));
+            }
+            ImageFilterManager manager = allFilters.get(this.owner.getImageDescription().getLabel());
+            this.setLastBufferedImage(bufferedImage);
+            try {
+                manager.applyFilters(bufferedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -184,29 +216,5 @@ public class GridImageController implements Initializable {
         try { ImageIO.write(bufferedImage, format, baos); }
         catch (IOException ignored) { return null; }
         return baos.toByteArray();
-    }
-
-    private BufferedImage applyCadreFilter(BufferedImage bufferedImage) throws IOException {
-        BufferedImage cadreBuffered = ImageIO.read(new File("src/main/resources/images/cadre.png"));
-        BufferedImage cadreResize = this.resize(cadreBuffered, bufferedImage.getWidth(), bufferedImage.getHeight());
-        Graphics2D g2d = bufferedImage.createGraphics();
-        g2d.setComposite(AlphaComposite.SrcOver.derive(1f));
-        int x = (bufferedImage.getWidth() - cadreResize.getWidth()) / 2;
-        int y = (bufferedImage.getHeight() - cadreResize.getHeight()) / 2;
-
-        g2d.drawImage(cadreResize, x, y, null);
-        g2d.dispose();
-        return bufferedImage;
-    }
-
-    public static BufferedImage resize(BufferedImage img, int newW, int newH) {
-        java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
-        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = dimg.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
-
-        return dimg;
     }
 }
