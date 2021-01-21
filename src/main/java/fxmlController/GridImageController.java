@@ -1,5 +1,6 @@
 package fxmlController;
 
+
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
@@ -32,6 +33,7 @@ public class GridImageController {
     @FXML
     private ImageView imageView;
 
+    private Frame frame;
     private ApplicationController owner;
     private final Java2DFrameConverter java2DFrameConverter = new Java2DFrameConverter();
 
@@ -56,11 +58,11 @@ public class GridImageController {
         grabber.start();
 
         Executors.newSingleThreadExecutor().execute(() -> {
-            Frame frame;
+
             while (!this.owner.getDisabledWebCam()) {
                 try {
-                    frame = grabber.grabFrame();
-                    setFrameToImageView(frame);
+                    this.frame = grabber.grabFrame();
+                    setFrameToImageView(this.frame);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -96,7 +98,7 @@ public class GridImageController {
             while (!this.owner.getDisabledWebCam()) {
                 try {
                     Thread.sleep(this.owner.getSpinnerTime());
-                    BufferedImage bufferedImage = SwingFXUtils.fromFXImage(this.getImageView().getImage(), null);
+                    BufferedImage bufferedImage = java2DFrameConverter.getBufferedImage(frame);
                     System.out.println("hello1");
                     byte[] bytes = toByteArray(bufferedImage, "jpg");
                     Tensor<Float> tensor2 =  tensorFlowUtils.byteBufferToTensor(bytes);
@@ -110,7 +112,7 @@ public class GridImageController {
                             tensor2
                     );
                     System.out.println("hello4");
-                    this.setDescription(tensorFlowUtils.getDescription(null, tensor, this.owner.allLabels));
+                    this.owner.setImageDescription(tensorFlowUtils.getDescription(null, tensor, this.owner.allLabels));
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
