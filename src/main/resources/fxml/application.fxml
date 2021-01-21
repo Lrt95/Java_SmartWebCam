@@ -66,7 +66,9 @@
         </columnConstraints>
         <rowConstraints>
             <RowConstraints minHeight="10.0" percentHeight="10.0" />
-            <RowConstraints minHeight="10.0" percentHeight="90.0" />
+            <RowConstraints minHeight="10.0" percentHeight="35.0" />
+            <RowConstraints minHeight="10.0" percentHeight="35.0" />
+            <RowConstraints minHeight="10.0" percentHeight="20.0" />
         </rowConstraints>
 
         <GridPane GridPane.rowIndex="0" hgap="10" vgap="10">
@@ -90,11 +92,9 @@
                 <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" percentHeight="10.0" />
-                <RowConstraints minHeight="10.0" percentHeight="10.0" />
-                <RowConstraints minHeight="10.0" percentHeight="10.0" />
-                <RowConstraints minHeight="10.0" percentHeight="10.0" />
-                <RowConstraints minHeight="10.0" percentHeight="50.0" />
+                <RowConstraints minHeight="10.0" percentHeight="33.3" />
+                <RowConstraints minHeight="10.0" percentHeight="33.3" />
+                <RowConstraints minHeight="10.0" percentHeight="33.3" />
             </rowConstraints>
 
             <Text text="Name : " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -106,13 +106,13 @@
                     <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
                     <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
                 </columnConstraints>
-                <ComboBox GridPane.columnIndex="0" GridPane.rowIndex="1" fx:id="comboBoxLabelsAvailable"
+                <ComboBox GridPane.columnIndex="0" fx:id="comboBoxLabelsAvailable"
                           promptText="Available" editable="true">
                     <items>
                         <FXCollections fx:factory="observableArrayList" />
                     </items>
                 </ComboBox>
-                <ComboBox GridPane.columnIndex="1"  GridPane.rowIndex="1" fx:id="comboBoxLabelsSelected"
+                <ComboBox GridPane.columnIndex="1" fx:id="comboBoxLabelsSelected"
                           promptText="Labels selected (0)" >
                     <items>
                         <FXCollections fx:factory="observableArrayList" />
@@ -120,7 +120,7 @@
                 </ComboBox>
             </GridPane>
 
-            <Text text="Percentage : " GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
+            <Text text="Percentage : " GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.valignment="CENTER"/>
             <GridPane GridPane.rowIndex="1" GridPane.columnIndex="1" >
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="100.0" />
@@ -131,7 +131,7 @@
                 </columnConstraints>
                 <Slider fx:id="sliderPercentage" GridPane.columnIndex="0"
                         majorTickUnit="10" showTickLabels="true" showTickMarks="true" />
-                <Text fx:id="textPercentage" GridPane.columnIndex="1" text="0 %" GridPane.halignment="CENTER" GridPane.valignment="TOP" />
+                <Text fx:id="textPercentage" GridPane.columnIndex="1" text="0 %" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
             </GridPane>
 
             <Text text="Time (sec) : " GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.valignment="CENTER"/>
@@ -140,11 +140,53 @@
                     <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="999999"/>
                 </valueFactory>
             </Spinner>
-
-            <Button id="buttonSave" text="Save" GridPane.halignment="LEFT"
-                    onAction="#handleButtonSave" disable="${controller.disableSave}"
-                    GridPane.rowIndex="3"
-            />
         </GridPane>
+
+        <GridPane GridPane.rowIndex="2" hgap="10" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" percentHeight="10.0" />
+                <RowConstraints minHeight="10.0" percentHeight="20.0" />
+                <RowConstraints minHeight="10.0" percentHeight="20.0" />
+                <RowConstraints minHeight="10.0" percentHeight="50.0" />
+            </rowConstraints>
+            <Text GridPane.rowIndex="0" text="Filter to apply:" />
+
+            <GridPane GridPane.rowIndex="1" hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="90.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                </rowConstraints>
+                <Text GridPane.columnIndex="0" text="Label :"/>
+                <ComboBox GridPane.columnIndex="1" fx:id="comboBoxFilter"
+                          promptText="Apply filter to..." >
+                    <items>
+                        <FXCollections fx:factory="observableArrayList" />
+                    </items>
+                </ComboBox>
+            </GridPane>
+
+            <GridPane GridPane.rowIndex="2" hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="90.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                </rowConstraints>
+                <Text GridPane.columnIndex="0" text="Color :" />
+                <TextField GridPane.columnIndex="1" promptText="r,g,b,a (ex: 120,144,255,255)" />
+            </GridPane>
+        </GridPane>
+
+        <Button GridPane.rowIndex="3" text="Save" GridPane.halignment="LEFT"
+                onAction="#handleButtonSave" disable="${controller.disableSave}"
+        />
+
     </GridPane>
 </GridPane>

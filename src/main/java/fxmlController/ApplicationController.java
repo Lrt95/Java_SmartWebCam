@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import utils.TensorFlowUtils;
 import utils.Utils;
 
 import saveImage.SaveImage;
+import imageFilterManager.imageFilterManager;
 
 public class ApplicationController implements Initializable {
     @FXML
@@ -51,6 +53,8 @@ public class ApplicationController implements Initializable {
     private ComboBox<String> comboBoxLabelsAvailable;
     @FXML
     private ComboBox<String> comboBoxLabelsSelected;
+    @FXML
+    public ComboBox<String> comboBoxFilter;
 
     private final StringProperty folderSave;
 
@@ -70,10 +74,10 @@ public class ApplicationController implements Initializable {
     private final BooleanProperty disabledWebCam;
 
     public boolean getDisabledWebCam() {
-        return this.disabledWebCam.get();
+        return this.disabledWebCam.getValue();
     }
 
-    public void setDisabledWebCam(boolean value) { this.disabledWebCam.set(value); }
+    public void setDisabledWebCam(boolean value) { this.disabledWebCam.setValue(value); }
 
     public BooleanProperty disabledWebCamProperty() {
         return this.disabledWebCam;
@@ -82,21 +86,37 @@ public class ApplicationController implements Initializable {
     private final BooleanProperty disableSave;
 
     public boolean getDisableSave() {
-        return disableSave.get();
+        return this.disableSave.getValue();
     }
 
     public void setDisableSave(boolean value) {
-        disableSave.set(value);
+        this.disableSave.setValue(value);
     }
 
     public BooleanProperty disableSaveProperty() {
-        return disableSave;
+        return this.disableSave;
     }
+
+    private BooleanProperty disableFilterEdition;
+
+    public boolean getDisableFilterEdition() {
+        return this.disableFilterEdition.getValue();
+    }
+
+    public void setDisableFilterEdition(boolean value) {
+        this.disableFilterEdition.setValue(value);
+    }
+
+    private BooleanProperty disableFilterEditionProperty() {
+        return this.disableFilterEdition;
+    }
+
 
     private final String OS;
     private Stage owner;
     public ArrayList<String> allLabels;
     private final ArrayList<String> allLabelsSelected;
+    private final HashMap<String, imageFilterManager>  labelFilters;
     public byte[] graphDef;
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
@@ -110,6 +130,7 @@ public class ApplicationController implements Initializable {
     public void setAllLabels(ArrayList<String> value) {
         this.allLabels = value;
         fetchAvailableLabels();
+        fetchFilters();
     }
 
     public void setGraphDef(byte[] value) {
@@ -129,9 +150,11 @@ public class ApplicationController implements Initializable {
      */
     public ApplicationController() {
         this.OS = System.getProperty("os.name").toLowerCase();
+        this.labelFilters = new HashMap<String, imageFilterManager>();
         this.folderSave = new SimpleStringProperty(null);
         this.disableSave = new SimpleBooleanProperty(true);
         this.disabledWebCam = new SimpleBooleanProperty(true);
+        this.disableFilterEdition = new SimpleBooleanProperty(true);
         this.allLabelsSelected = new ArrayList<>();
     }
 
@@ -141,9 +164,9 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL url, ResourceBundle resources) {
-        sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
-            percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
-            textPercentage.setText(percentage + " %");
+        this.sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
+            this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
+            this.textPercentage.setText(this.percentage + " %");
         });
         this.comboBoxLabelsAvailable.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
             fetchAvailableLabels();
@@ -178,9 +201,9 @@ public class ApplicationController implements Initializable {
      */
     private void checkCanSave() {
         setDisableSave(
-                folderSave.getValue() == null ||
+                this.folderSave.getValue() == null ||
                 this.allLabelsSelected.size() == 0 ||
-                imageDescription == null
+                this.imageDescription == null
         );
     }
 
@@ -284,6 +307,16 @@ public class ApplicationController implements Initializable {
                 new Java2DFrameConverter().getBufferedImage(this.gridImageController.getFrame());
         SaveImage saveImage = new SaveImage(this.percentage, this.allLabelsSelected, folderSave.getValue());
         saveImage.save(this.imageDescription, bufferedImage);
+    }
+
+    /**
+     * Feed the comboBox of the filter labels.
+     */
+    private void fetchFilters() {
+        this.comboBoxFilter.getItems().clear();
+        for (String label : this.allLabels) {
+            this.comboBoxFilter.getItems().add(label);
+        }
     }
 
     /**
