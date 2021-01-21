@@ -63,8 +63,6 @@ public class ApplicationController implements Initializable {
     @FXML
     private ComboBox<String> comboBoxLabelsSelected;
 
-    private final Java2DFrameConverter java2DFrameConverter = new Java2DFrameConverter();
-
     private final StringProperty folderSave;
 
     public String getFolderSave() {
@@ -108,9 +106,9 @@ public class ApplicationController implements Initializable {
 
     private final String OS;
     private Stage owner;
-    private ArrayList<String> allLabels;
+    public ArrayList<String> allLabels;
     private final ArrayList<String> allLabelsSelected;
-    private byte[] graphDef;
+    public byte[] graphDef;
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
 
@@ -130,7 +128,7 @@ public class ApplicationController implements Initializable {
         this.graphDef = value;
     }
 
-    private int getSpinnerTime() {
+    public int getSpinnerTime() {
         return Integer.parseInt(this.spinnerTime.getValue().toString()) * 1000;
     }
 
@@ -196,7 +194,7 @@ public class ApplicationController implements Initializable {
      * set description on application after the tensor result
      * @param imageDescription of the tensor result
      */
-    private void setImageDescription(ImageDescription imageDescription) {
+    public void setImageDescription(ImageDescription imageDescription) {
         this.imageDescription = imageDescription;
         this.textPath.setText(imageDescription != null ? "Path: " + this.imageDescription.getPath() : "Path: ");
         this.gridImageController.setDescription(this.imageDescription);
@@ -228,11 +226,11 @@ public class ApplicationController implements Initializable {
         this.resetAfterToggle();
         this.setDisabledWebCam(!this.getDisabledWebCam());
         if (!this.getDisabledWebCam()) {
-            this.setCam();
+            this.gridImageController.setCam();
         }
     }
 
-    private void resetAfterToggle() {
+    public void resetAfterToggle() {
         this.setImageDescription(null);
     }
 
@@ -314,82 +312,11 @@ public class ApplicationController implements Initializable {
 
     private void fetchSelectedLabels() {
         this.comboBoxLabelsSelected.getItems().clear();
-        //Collections.sort(this.allLabelsSelected);
         this.allLabelsSelected.sort(String::compareToIgnoreCase);
         for (String label : this.allLabelsSelected) {
             this.comboBoxLabelsSelected.getItems().add(label);
         }
         this.comboBoxLabelsSelected.setPromptText("Labels selected (" + this.comboBoxLabelsSelected.getItems().size() + ")");
-    }
-
-    @FXML
-    private void setCam() throws FrameGrabber.Exception {
-        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(2);
-
-
-
-            grabber.start();
-            Executors.newSingleThreadExecutor().execute(() -> {
-                Frame frame;
-                while (!this.getDisabledWebCam()) {
-                    try {
-                        frame = grabber.grabFrame();
-                        setFrameToImageView(frame);
-                    } catch (FrameGrabber.Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                try {
-                    grabber.stop();
-                } catch (FrameGrabber.Exception e) {
-                    e.printStackTrace();
-                }
-                this.resetAfterToggle();
-            });
-
-    }
-
-    private void setFrameToImageView(Frame frame) {
-        try {
-            Thread.sleep(this.getSpinnerTime());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        this.gridImageController.getImageView().setImage(frameToImage(frame));
-    }
-
-    private WritableImage frameToImage(Frame frame) {
-        BufferedImage bufferedImage = java2DFrameConverter.getBufferedImage(frame);
-        try {
-            this.setDescriptionCam(bufferedImage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return SwingFXUtils.toFXImage(bufferedImage, null);
-    }
-
-    private void setDescriptionCam(BufferedImage bufferedImage) throws IOException {
-
-        byte[] bytes = toByteArray(bufferedImage, "jpg");
-
-
-        TensorFlowUtils tensorFlowUtils = new TensorFlowUtils();
-        Tensor<Float> tensor = tensorFlowUtils.executeModelFromByteArray(
-                this.graphDef,
-                tensorFlowUtils.byteBufferToTensor(bytes)
-        );
-        setImageDescription(tensorFlowUtils.getDescription(null, tensor, this.allLabels));
-    }
-
-    // convert BufferedImage to byte[]
-    public static byte[] toByteArray(BufferedImage bufferedImage, String format)
-            throws IOException {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, format, baos);
-        byte[] bytes = baos.toByteArray();
-        return bytes;
-
     }
 
 }

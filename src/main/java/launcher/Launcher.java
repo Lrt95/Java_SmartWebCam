@@ -36,6 +36,7 @@ public class Launcher extends Application {
 
         Scene scene = new Scene(root);
 
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
