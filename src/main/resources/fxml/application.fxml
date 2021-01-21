@@ -150,8 +150,11 @@
                 <RowConstraints minHeight="10.0" percentHeight="10.0" />
                 <RowConstraints minHeight="10.0" percentHeight="20.0" />
                 <RowConstraints minHeight="10.0" percentHeight="20.0" />
-                <RowConstraints minHeight="10.0" percentHeight="50.0" />
+                <RowConstraints minHeight="10.0" percentHeight="20.0" />
+                <RowConstraints minHeight="10.0" percentHeight="20.0" />
+                <RowConstraints minHeight="10.0" percentHeight="10.0" />
             </rowConstraints>
+
             <Text GridPane.rowIndex="0" text="Filter to apply:" />
 
             <GridPane GridPane.rowIndex="1" hgap="10" vgap="10">
@@ -164,7 +167,7 @@
                 </rowConstraints>
                 <Text GridPane.columnIndex="0" text="Label :"/>
                 <ComboBox GridPane.columnIndex="1" fx:id="comboBoxFilter"
-                          promptText="Apply filter to..." >
+                          promptText="Apply filter to...">
                     <items>
                         <FXCollections fx:factory="observableArrayList" />
                     </items>
@@ -173,14 +176,42 @@
 
             <GridPane GridPane.rowIndex="2" hgap="10" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="90.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="85.0" />
                 </columnConstraints>
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" percentHeight="100.0" />
                 </rowConstraints>
-                <Text GridPane.columnIndex="0" text="Color :" />
-                <TextField GridPane.columnIndex="1" promptText="r,g,b,a (ex: 120,144,255,255)" />
+                <ToggleSwitch GridPane.columnIndex="0" text="Color :" fx:id="toggleApplyFilterColor" selected="false"/>
+                <TextField GridPane.columnIndex="1" fx:id="textFieldColorFilter"
+                           promptText="r,g,b,a (ex: 0,144,255,255)" />
+            </GridPane>
+
+            <GridPane GridPane.rowIndex="3" hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="85.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                </rowConstraints>
+                <ToggleSwitch GridPane.columnIndex="0" text="Border :" fx:id="toggleApplyFilterBorder" selected="false"/>
+            </GridPane>
+
+            <GridPane GridPane.rowIndex="4" hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="65.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                </rowConstraints>
+                <ToggleSwitch GridPane.columnIndex="0" text="Picture :" fx:id="toggleApplyFilterPicture" selected="false"/>
+                <TextField    GridPane.columnIndex="1" promptText="x" />
+                <TextField    GridPane.columnIndex="2" promptText="y" />
+                <Button       GridPane.columnIndex="3" text="Select picture" />
             </GridPane>
         </GridPane>
 
