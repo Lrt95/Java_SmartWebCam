@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -38,7 +39,7 @@ import imageFilterManager.imageFilterManager;
 
 public class ApplicationController implements Initializable {
     @FXML
-    public ToggleSwitch toggleSwitchWebCam;
+    private ToggleSwitch toggleSwitchWebCam;
     @FXML
     private Text textPath;
     @FXML
@@ -54,21 +55,29 @@ public class ApplicationController implements Initializable {
     @FXML
     private ComboBox<String> comboBoxLabelsSelected;
     @FXML
-    public ComboBox<String> comboBoxFilter;
+    private ToggleSwitch toggleApplyFilterColor;
+    @FXML
+    private ToggleSwitch toggleApplyFilterBorder;
+    @FXML
+    private ToggleSwitch toggleApplyFilterPicture;
+    @FXML
+    private ComboBox<String> comboBoxFilter;
+    @FXML
+    private TextField textFieldColorFilter;
 
     private final StringProperty folderSave;
 
     public String getFolderSave() {
-        return folderSave.getValue();
+        return this.folderSave.getValue();
     }
 
     public void setFolderSave(String value) {
-        folderSave.setValue(value);
+        this.folderSave.setValue(value);
         checkCanSave();
     }
 
     public StringProperty folderSaveProperty() {
-        return folderSave;
+        return this.folderSave;
     }
 
     private final BooleanProperty disabledWebCam;
@@ -77,7 +86,9 @@ public class ApplicationController implements Initializable {
         return this.disabledWebCam.getValue();
     }
 
-    public void setDisabledWebCam(boolean value) { this.disabledWebCam.setValue(value); }
+    public void setDisabledWebCam(boolean value) {
+        this.disabledWebCam.setValue(value);
+    }
 
     public BooleanProperty disabledWebCamProperty() {
         return this.disabledWebCam;
@@ -97,7 +108,7 @@ public class ApplicationController implements Initializable {
         return this.disableSave;
     }
 
-    private BooleanProperty disableFilterEdition;
+    private final BooleanProperty disableFilterEdition;
 
     public boolean getDisableFilterEdition() {
         return this.disableFilterEdition.getValue();
@@ -111,16 +122,14 @@ public class ApplicationController implements Initializable {
         return this.disableFilterEdition;
     }
 
-
     private final String OS;
     private Stage owner;
     public ArrayList<String> allLabels;
     private final ArrayList<String> allLabelsSelected;
-    private final HashMap<String, imageFilterManager>  labelFilters;
+    private final HashMap<String, imageFilterManager> labelFilters;
     public byte[] graphDef;
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
-
     private int percentage;
 
     public void setOwner(Stage value) {
@@ -141,7 +150,7 @@ public class ApplicationController implements Initializable {
         return Integer.parseInt(this.spinnerTime.getValue().toString()) * 1000;
     }
 
-    public String getOS(){
+    public String getOS() {
         return this.OS;
     }
 
@@ -160,7 +169,8 @@ public class ApplicationController implements Initializable {
 
     /**
      * Call after the controller was created.
-     * @param url Url
+     *
+     * @param url       Url
      * @param resources Resources
      */
     public void initialize(URL url, ResourceBundle resources) {
@@ -168,19 +178,70 @@ public class ApplicationController implements Initializable {
             this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
             this.textPercentage.setText(this.percentage + " %");
         });
-        this.comboBoxLabelsAvailable.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-            fetchAvailableLabels();
+        this.comboBoxLabelsAvailable.getEditor().textProperty().addListener((observable, oldValue, newValue) -> fetchAvailableLabels());
+        this.comboBoxLabelsAvailable.valueProperty().addListener((observable, oldValue, newValue) -> {
+            addSelectedLabel(newValue);
             checkCanSave();
         });
-        this.comboBoxLabelsAvailable.valueProperty().addListener((observable, oldValue, newValue) -> addSelectedLabel(newValue));
-        this.comboBoxLabelsSelected.valueProperty().addListener(((observable, oldValue, newValue) -> removeSelectedLabel(newValue)));
+        this.comboBoxLabelsSelected.valueProperty().addListener((observable, oldValue, newValue) -> {
+            removeSelectedLabel(newValue);
+            checkCanSave();
+        });
+
+        //this.comboBoxFilter.getEditor().textProperty().addListener((observable, oldValue, newValue) -> fetchFilters());
+        this.comboBoxFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                imageFilterManager manager;
+                if (!this.labelFilters.containsKey(newValue)) {
+                    this.labelFilters.put(newValue, new imageFilterManager(0, 0, 0, 255));
+                }
+                manager = this.labelFilters.get(newValue);
+                setDisableFilterEdition(false);
+                this.textFieldColorFilter.setText(manager.getColor());
+                this.toggleApplyFilterColor.setSelected(manager.getIsFilterColorApply());
+                this.toggleApplyFilterBorder.setSelected(manager.getIsFilterBorderApply());
+                this.toggleApplyFilterPicture.setSelected(manager.getIsFilterPictureApply());
+
+            } else {
+                setDisableFilterEdition(true);
+                this.toggleApplyFilterColor.setSelected(false);
+                this.toggleApplyFilterBorder.setSelected(false);
+                this.toggleApplyFilterPicture.setSelected(false);
+            }
+        });
+        this.toggleApplyFilterColor.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!getDisableFilterEdition()) {
+                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                manager.setIsFilterColorApply(!manager.getIsFilterColorApply());
+            }
+        });
+        this.toggleApplyFilterPicture.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!getDisableFilterEdition()) {
+                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                manager.setIsFilterPictureApply(!manager.getIsFilterPictureApply());
+            }
+        });
+        this.toggleApplyFilterBorder.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!getDisableFilterEdition()) {
+                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                manager.setIsFilterBorderApply(!manager.getIsFilterBorderApply());
+            }
+        });
+        this.textFieldColorFilter.textProperty().addListener(((observable, oldValue, newValue) -> {
+            if (!getDisableFilterEdition()) {
+                imageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                manager.setFromString(newValue);
+                if (!manager.getColor().equals(newValue)) {
+                    this.textFieldColorFilter.setText(manager.getColor());
+                }
+            }
+        }));
 
         this.toggleSwitchWebCam.selectedProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 onToggleClick();
+            } catch (FrameGrabber.Exception ignored) {
             }
-            catch (FrameGrabber.Exception ignored) {}
-
         });
 
         FXMLLoader loader = new FXMLLoader();
@@ -201,14 +262,15 @@ public class ApplicationController implements Initializable {
      */
     private void checkCanSave() {
         setDisableSave(
-                this.folderSave.getValue() == null ||
-                this.allLabelsSelected.size() == 0 ||
-                this.imageDescription == null
+                this.getFolderSave() == null ||
+                        this.allLabelsSelected.size() == 0 ||
+                        this.imageDescription == null
         );
     }
 
     /**
      * set description on application after the tensor result
+     *
      * @param imageDescription of the tensor result
      */
     public void setImageDescription(ImageDescription imageDescription) {
@@ -222,6 +284,7 @@ public class ApplicationController implements Initializable {
      * EventHandler of the button "Select Picture"
      * <p>
      * Select a file and get it to TensorFlow and the data.
+     *
      * @param event The event given by the sender
      * @throws IOException if file not exists
      */
@@ -240,6 +303,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Call when the WebCam toggle is clicked
+     *
      * @throws FrameGrabber.Exception if device not found
      */
     private void onToggleClick() throws FrameGrabber.Exception {
@@ -259,6 +323,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Select a file with a chooser window
+     *
      * @return The selected file
      */
     private File openFile() {
@@ -275,6 +340,7 @@ public class ApplicationController implements Initializable {
      * EventHandler of the button "Select Save Folder"
      * <p>
      * Select a folder to save the picture.
+     *
      * @param event The event given by the sender
      */
     @FXML
@@ -287,6 +353,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Select a folder with a chooser window
+     *
      * @return The selected folder
      */
     private File openDirectory() {
@@ -298,6 +365,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Save the picture to the save folder selected
+     *
      * @param event The event raise by the sender
      */
     @FXML
@@ -317,6 +385,7 @@ public class ApplicationController implements Initializable {
         for (String label : this.allLabels) {
             this.comboBoxFilter.getItems().add(label);
         }
+        this.comboBoxFilter.getItems().sort(String::compareToIgnoreCase);
     }
 
     /**
@@ -334,6 +403,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Add a label in the SelectedLabels List
+     *
      * @param label The new label to add
      */
     private void addSelectedLabel(String label) {
@@ -346,6 +416,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Remove a label from the SelectedLabels List
+     *
      * @param label The label to remove
      */
     private void removeSelectedLabel(String label) {
