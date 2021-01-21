@@ -71,7 +71,7 @@ public class TensorFlowUtils {
         }
     }
 
-    public ImageDescription getDescription(Tensor<Float> input, ArrayList<String> labels) {
+    public ImageDescription getDescription(String path, Tensor<Float> input, ArrayList<String> labels) {
         long[] shape = input.shape();
         if (input.numDimensions() != 2 || shape[0] != 1) {
             throw new RuntimeException(
@@ -83,7 +83,7 @@ public class TensorFlowUtils {
         float[] probabilities = input.copyTo(new float[1][nLabels])[0];
 
         int index = Utils.maxIndex(probabilities);
-        return new ImageDescription(index, probabilities[index], labels.get(index));
+        return new ImageDescription(path, index, probabilities[index], labels.get(index));
     }
 
 
