@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
@@ -22,6 +23,8 @@ import javafx.stage.Stage;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +58,10 @@ public class ApplicationController implements Initializable {
     private Text textPercentage;
     @FXML
     private Spinner<Integer> spinnerTime;
+    @FXML
+    private ComboBox<String> comboBoxLabelsAvailable;
+    @FXML
+    private ComboBox<String> comboBoxLabelsSelected;
 
     private final Java2DFrameConverter java2DFrameConverter = new Java2DFrameConverter();
 
@@ -79,9 +86,7 @@ public class ApplicationController implements Initializable {
         return this.disabledWebCam.get();
     }
 
-    public void setDisabledWebCam(boolean value) {
-        this.disabledWebCam.set(value);
-    }
+    public void setDisabledWebCam(boolean value) { this.disabledWebCam.set(value); }
 
     public BooleanProperty disabledWebCamProperty() {
         return this.disabledWebCam;
@@ -104,6 +109,7 @@ public class ApplicationController implements Initializable {
     private final String OS;
     private Stage owner;
     private ArrayList<String> allLabels;
+    private final ArrayList<String> allLabelsSelected;
     private byte[] graphDef;
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
@@ -115,15 +121,13 @@ public class ApplicationController implements Initializable {
     }
 
     public void setAllLabels(ArrayList<String> value) {
+        value.sort(String::compareToIgnoreCase);
         this.allLabels = value;
+        fetchAvailableLabels();
     }
 
     public void setGraphDef(byte[] value) {
         this.graphDef = value;
-    }
-
-    private String getPictureName() {
-        return this.textFieldPictureName.getText();
     }
 
     private int getSpinnerTime() {
@@ -142,20 +146,26 @@ public class ApplicationController implements Initializable {
         this.folderSave = new SimpleStringProperty(null);
         this.disableSave = new SimpleBooleanProperty(true);
         this.disabledWebCam = new SimpleBooleanProperty(true);
+        this.allLabelsSelected = new ArrayList<>();
     }
-
 
     /**
      * Call after the controller was created.
-     *
-     * @param url       Url
+     * @param url Url
      * @param resources Resources
      */
     public void initialize(URL url, ResourceBundle resources) {
-        this.sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
-            this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
-            this.textPercentage.setText(percentage + " %");
+        sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
+            percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
+            textPercentage.setText(percentage + " %");
         });
+        this.comboBoxLabelsAvailable.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            fetchAvailableLabels();
+            checkCanSave();
+        });
+        this.comboBoxLabelsAvailable.valueProperty().addListener((observable, oldValue, newValue) -> addSelectedLabel(newValue));
+        this.comboBoxLabelsSelected.valueProperty().addListener(((observable, oldValue, newValue) -> removeSelectedLabel(newValue)));
+
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/imagePanel.fxml"));
         try {
@@ -169,12 +179,6 @@ public class ApplicationController implements Initializable {
 
     }
 
-    /**
-     * Remove the double spaces in the textField of PictureName
-     */
-    private void checkPictureName() {
-        this.textFieldPictureName.setText(this.textFieldPictureName.getText().replaceAll(" ", " ").trim());
-    }
 
     /**
      * Check if the user can save the image.
@@ -183,22 +187,19 @@ public class ApplicationController implements Initializable {
     private void checkCanSave() {
         setDisableSave(
                 folderSave.getValue() == null ||
-                        getPictureName() == null ||
-                        getPictureName().length() == 0 ||
-                        imageDescription == null
+                this.allLabelsSelected.size() == 0 ||
+                imageDescription == null
         );
     }
 
     /**
      * set description on application after the tensor result
-     *
      * @param imageDescription of the tensor result
      */
     private void setImageDescription(ImageDescription imageDescription) {
         this.imageDescription = imageDescription;
         this.textPath.setText(imageDescription != null ? "Path: " + this.imageDescription.getPath() : "Path: ");
         this.gridImageController.setDescription(this.imageDescription);
-        checkPictureName();
         checkCanSave();
     }
 
@@ -206,7 +207,6 @@ public class ApplicationController implements Initializable {
      * EventHandler of the button "Select Picture"
      * <p>
      * Select a file and get it to TensorFlow and the data.
-     *
      * @param event The event given by the sender
      * @throws IOException if file not exists
      */
@@ -238,7 +238,6 @@ public class ApplicationController implements Initializable {
 
     /**
      * Select a file with a chooser window
-     *
      * @return The selected file
      */
     private File openFile() {
@@ -255,7 +254,6 @@ public class ApplicationController implements Initializable {
      * EventHandler of the button "Select Save Folder"
      * <p>
      * Select a folder to save the picture.
-     *
      * @param event The event given by the sender
      */
     @FXML
@@ -264,12 +262,10 @@ public class ApplicationController implements Initializable {
         if (file != null) {
             setFolderSave(file.getPath());
         }
-        checkPictureName();
     }
 
     /**
      * Select a folder with a chooser window
-     *
      * @return The selected folder
      */
     private File openDirectory() {
@@ -281,25 +277,49 @@ public class ApplicationController implements Initializable {
 
     /**
      * Save the picture to the save folder selected
-     *
      * @param event The event raise by the sender
      */
     @FXML
     private void handleButtonSave(ActionEvent event) {
-        checkPictureName();
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(this.gridImageController.getImageView().getImage(), null);
-        SaveImage saveImage = new SaveImage(this.percentage, getPictureName(), folderSave.getValue());
+        SaveImage saveImage = new SaveImage(this.percentage, this.allLabelsSelected, folderSave.getValue());
         saveImage.save(this.imageDescription, bufferedImage);
     }
 
-    /**
-     * EventHandler on KeyPress on the TextField of PictureName
-     *
-     * @param keyEvent The event raise by the sender
-     */
-    @FXML
-    private void pictureNameKeyPressed(KeyEvent keyEvent) {
-        checkCanSave();
+    private void fetchAvailableLabels() {
+        String filter = this.comboBoxLabelsAvailable.getEditor().getText();
+        this.comboBoxLabelsAvailable.getItems().clear();
+        for (String label : this.allLabels) {
+            if (label.startsWith(filter) && !this.allLabelsSelected.contains(label)) {
+                this.comboBoxLabelsAvailable.getItems().add(label);
+            }
+        }
+    }
+
+    private void addSelectedLabel(String label) {
+        if (label != null && label.length() > 0 && !this.allLabelsSelected.contains(label)) {
+            this.allLabelsSelected.add(label);
+            fetchSelectedLabels();
+            fetchAvailableLabels();
+        }
+    }
+
+    private void removeSelectedLabel(String label) {
+        if (label != null && label.length() > 0) {
+            this.allLabelsSelected.remove(label);
+            fetchSelectedLabels();
+            fetchAvailableLabels();
+        }
+    }
+
+    private void fetchSelectedLabels() {
+        this.comboBoxLabelsSelected.getItems().clear();
+        //Collections.sort(this.allLabelsSelected);
+        this.allLabelsSelected.sort(String::compareToIgnoreCase);
+        for (String label : this.allLabelsSelected) {
+            this.comboBoxLabelsSelected.getItems().add(label);
+        }
+        this.comboBoxLabelsSelected.setPromptText("Labels selected (" + this.comboBoxLabelsSelected.getItems().size() + ")");
     }
 
     @FXML

@@ -3,17 +3,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.text.Text?>
+<?import javafx.collections.FXCollections?>
+
 <?import org.controlsfx.control.ToggleSwitch ?>
 
 <GridPane fx:controller="fxmlController.ApplicationController" xmlns:fx="http://javafx.com/fxml"
           prefHeight="720" prefWidth="1280"
           hgap="10" vgap="10">
     <columnConstraints>
-        <ColumnConstraints minWidth="10.0" percentWidth="02.0" />
-        <ColumnConstraints minWidth="10.0" percentWidth="58.0" />
-        <ColumnConstraints minWidth="10.0" percentWidth="38.0" />
-        <ColumnConstraints minWidth="10.0" percentWidth="02.0" />
+        <ColumnConstraints minWidth="10.0" percentWidth="01.0" />
+        <ColumnConstraints minWidth="10.0" percentWidth="49.0" />
+        <ColumnConstraints minWidth="10.0" percentWidth="49.0" />
+        <ColumnConstraints minWidth="10.0" percentWidth="01.0" />
     </columnConstraints>
     <rowConstraints>
         <RowConstraints minHeight="10.0" percentHeight="05.0" />
@@ -28,7 +31,8 @@
         <rowConstraints>
             <RowConstraints minHeight="10.0" percentHeight="02.0" />
             <RowConstraints minHeight="10.0" percentHeight="08.0" />
-            <RowConstraints minHeight="10.0" percentHeight="90.0" />
+            <RowConstraints minHeight="10.0" percentHeight="70.0" />
+            <RowConstraints minHeight="10.0" percentHeight="20.0" />
         </rowConstraints>
 
         <GridPane GridPane.rowIndex="0" hgap="10" vgap="10">
@@ -51,7 +55,6 @@
 <!--                       pickOnBounds="true" preserveRatio="true"-->
 <!--            />-->
         </GridPane>
-
 
     </GridPane>
 
@@ -78,8 +81,8 @@
 
         <GridPane GridPane.rowIndex="1" hgap="10" vgap="10">
             <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
-                <ColumnConstraints minWidth="10.0" percentWidth="30.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" percentHeight="10.0" />
@@ -93,27 +96,46 @@
             <TextField fx:id="textFieldPictureName" GridPane.rowIndex="0" GridPane.columnIndex="1"
                        onKeyPressed="#pictureNameKeyPressed" />
 
-            <Text text="Percentage : " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <GridPane GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2" >
+                <columnConstraints>
+                    <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
+                </columnConstraints>
+                <ComboBox GridPane.columnIndex="0" GridPane.rowIndex="1" fx:id="comboBoxLabelsAvailable"
+                          promptText="Available" editable="true">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList" />
+                    </items>
+                </ComboBox>
+                <ComboBox GridPane.columnIndex="1"  GridPane.rowIndex="1" fx:id="comboBoxLabelsSelected"
+                          promptText="Labels selected (0)" >
+                    <items>
+                        <FXCollections fx:factory="observableArrayList" />
+                    </items>
+                </ComboBox>
+            </GridPane>
+
+            <Text text="Percentage : " GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
             <GridPane GridPane.rowIndex="1" GridPane.columnIndex="1" >
                 <columnConstraints>
                     <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
                     <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
                 </columnConstraints>
                 <Slider fx:id="sliderPercentage" GridPane.columnIndex="0"
-                        majorTickUnit="20" showTickLabels="true" showTickMarks="true" />
-                <Text fx:id="textPercentage" GridPane.columnIndex="1" text="0 %" GridPane.halignment="CENTER" />
+                        majorTickUnit="10" showTickLabels="true" showTickMarks="true" />
+                <Text fx:id="textPercentage" GridPane.columnIndex="1" text="0 %" GridPane.halignment="CENTER" GridPane.valignment="TOP" />
             </GridPane>
 
-            <Text text="Time (sec) : " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <Spinner fx:id="spinnerTime" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+            <Text text="Time (sec) : " GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.valignment="CENTER"/>
+            <Spinner fx:id="spinnerTime" GridPane.rowIndex="2" GridPane.columnIndex="1">
                 <valueFactory>
-                    <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="999999"/>
+                    <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="999999"/>
                 </valueFactory>
             </Spinner>
 
-            <Button id="buttonSave" text="Save" GridPane.halignment="CENTER"
+            <Button id="buttonSave" text="Save" GridPane.halignment="LEFT"
                     onAction="#handleButtonSave" disable="${controller.disableSave}"
-                    GridPane.rowIndex="3" GridPane.columnSpan="2"
+                    GridPane.rowIndex="3"
             />
 
         </GridPane>
