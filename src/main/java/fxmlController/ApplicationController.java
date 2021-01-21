@@ -10,41 +10,24 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.util.Collections;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
-
-import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
-import org.bytedeco.javacv.Java2DFrameConverter;
-import org.bytedeco.javacv.OpenCVFrameGrabber;
 import org.controlsfx.control.ToggleSwitch;
 import org.tensorflow.Tensor;
-
 import saveImage.SaveImage;
-
 import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
-
-import javax.imageio.ImageIO;
 
 public class ApplicationController implements Initializable {
     @FXML
@@ -120,7 +103,6 @@ public class ApplicationController implements Initializable {
     }
 
     public void setAllLabels(ArrayList<String> value) {
-        value.sort(String::compareToIgnoreCase);
         this.allLabels = value;
         fetchAvailableLabels();
     }
@@ -243,7 +225,7 @@ public class ApplicationController implements Initializable {
     /**
      * Reset image description
      */
-    private void resetImageDescription() {
+    public void resetImageDescription() {
         this.setImageDescription(null);
     }
 

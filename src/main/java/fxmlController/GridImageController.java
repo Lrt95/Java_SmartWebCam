@@ -76,7 +76,7 @@ public class GridImageController {
             } catch (FrameGrabber.Exception e) {
                 e.printStackTrace();
             }
-            this.owner.resetAfterToggle();
+            this.owner.resetImageDescription();
         });
 
     }
