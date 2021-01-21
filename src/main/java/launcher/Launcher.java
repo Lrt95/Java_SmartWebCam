@@ -19,6 +19,11 @@ public class Launcher extends Application {
         launch(args);
     }
 
+    /**
+     * The method call by the application to run
+     * @param primaryStage The current stage
+     * @throws IOException if error
+     */
     @Override
     public void start(Stage primaryStage) throws IOException {
 

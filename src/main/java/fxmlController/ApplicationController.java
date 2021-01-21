@@ -15,19 +15,24 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.bytedeco.javacv.FrameGrabber;
+import org.bytedeco.javacv.Java2DFrameConverter;
 import org.controlsfx.control.ToggleSwitch;
 import org.tensorflow.Tensor;
-import saveImage.SaveImage;
+
 import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
+
+import saveImage.SaveImage;
 
 public class ApplicationController implements Initializable {
     @FXML
@@ -274,7 +279,9 @@ public class ApplicationController implements Initializable {
      */
     @FXML
     private void handleButtonSave(ActionEvent event) {
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(this.gridImageController.getImageView().getImage(), null);
+        BufferedImage bufferedImage = getDisabledWebCam() ?
+                SwingFXUtils.fromFXImage(this.gridImageController.getImageView().getImage(), null) :
+                new Java2DFrameConverter().getBufferedImage(this.gridImageController.getFrame());
         SaveImage saveImage = new SaveImage(this.percentage, this.allLabelsSelected, folderSave.getValue());
         saveImage.save(this.imageDescription, bufferedImage);
     }
@@ -327,5 +334,4 @@ public class ApplicationController implements Initializable {
         }
         this.comboBoxLabelsSelected.setPromptText("Labels selected (" + this.comboBoxLabelsSelected.getItems().size() + ")");
     }
-
 }
