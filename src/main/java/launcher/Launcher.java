@@ -43,7 +43,7 @@ public class Launcher extends Application {
         controller.setGraphDef(graphDef);
 
         Scene scene = new Scene(root);
-
+        primaryStage.setTitle("Smart WebCam");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
