@@ -142,18 +142,10 @@ public class ApplicationController implements Initializable {
     private List<Webcam> webCams;
     private int deviceSelectedIndex;
 
-    /**
-     * set link parent children
-     * @param value children Component
-     */
     public void setOwner(Stage value) {
         this.owner = value;
     }
 
-    /**
-     * set allLabels in ArrayList
-     * @param value ArrayList
-     */
     public void setAllLabels(ArrayList<String> value) {
         this.allLabels = value;
         fetchAvailableLabels();
@@ -171,6 +163,7 @@ public class ApplicationController implements Initializable {
     private void setDeviceSelectedIndex(int value) {
         this.deviceSelectedIndex = value;
     }
+
     public int getDeviceSelectedIndex() {
         return this.deviceSelectedIndex;
     }
@@ -221,7 +214,9 @@ public class ApplicationController implements Initializable {
         }
     }
 
-
+    /**
+     * Detect the webcam devices and refresh the view
+     */
     private void updateWebCamDevices() {
         this.webCams = Webcam.getWebcams();
         switch (this.webCams.size()) {
@@ -254,7 +249,6 @@ public class ApplicationController implements Initializable {
         fetchDevicesDetected();
     }
 
-
     /**
      * Stop thread cam when exit app
      */
@@ -274,24 +268,26 @@ public class ApplicationController implements Initializable {
         }
     }
 
-
+    /**
+     * Force to disable the WebCam
+     */
     public void stopCam() {
         this.toggleSwitchWebCam.setSelected(false);
     }
 
+    /**
+     * Event raise when the devices combobox has changed value
+     * @param newValue The new selected value
+     */
     private void comboBoxDevicesValueChanged(String newValue) {
-        int i;
-        for (i = 0; i < this.webCams.size(); i++) {
+        for (int i = 0; i < this.webCams.size(); i++) {
             if (this.webCams.get(i).getName().equals(newValue)) {
                 setDeviceSelectedIndex(i);
-                break;
+                return;
             }
         }
-        if (i == this.webCams.size()) {
-            setDeviceSelectedIndex(-1);
-        }
+        setDeviceSelectedIndex(-1);
     }
-
 
     /**
      * Change min percentage probability detection
@@ -452,6 +448,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * The event raise when the refresh devices button is clicked
+     * @param actionEvent The event
+     */
     @FXML
     private void refreshDevicesButtonClick(ActionEvent actionEvent) {
         updateWebCamDevices();
