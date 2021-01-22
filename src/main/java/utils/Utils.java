@@ -1,5 +1,12 @@
 package utils;
 
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,5 +69,46 @@ public class Utils {
         }
         double rounder = Math.pow(10, precision);
         return Math.round(value * rounder) / rounder;
+    }
+
+    /**
+     * Select a file with a chooser window
+     *
+     * @return The selected file
+     */
+
+    public static File openFile(Stage owner, String title, String sourceFolder, FileChooser.ExtensionFilter filter) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle(title);
+        chooser.setInitialDirectory(new File(sourceFolder));
+        if (filter != null) {
+            chooser.getExtensionFilters().add(filter);
+        }
+        return chooser.showOpenDialog(owner);
+    }
+
+    /**
+     * Select a folder with a chooser window
+     *
+     * @return The selected folder
+     */
+    public static File openDirectory(Stage owner, String title, String sourceFolder) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle(title);
+        chooser.setInitialDirectory(new File(sourceFolder));
+        return chooser.showDialog(owner);
+    }
+
+    /**
+     * Convert a bufferedImage to a bytes buffer
+     * @param bufferedImage The source
+     * @param format The format
+     * @return The bytes buffer
+     */
+    public static byte[] toByteArray(BufferedImage bufferedImage, String format) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try { ImageIO.write(bufferedImage, format, baos); }
+        catch (IOException ignored) { return null; }
+        return baos.toByteArray();
     }
 }

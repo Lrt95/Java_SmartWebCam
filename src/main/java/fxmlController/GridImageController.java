@@ -4,7 +4,6 @@ import imageFilterManager.ImageFilterManager;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.text.Text;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.bytedeco.javacv.Frame;
@@ -25,15 +23,11 @@ import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameGrabber;
 
-
 import org.tensorflow.Tensor;
 
 import utils.ImageDescription;
 import utils.TensorFlowUtils;
 import utils.Utils;
-
-import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
-
 
 public class GridImageController implements Initializable {
     @FXML
@@ -193,7 +187,7 @@ public class GridImageController implements Initializable {
      */
     private void timerCamDescriptionTick() {
         BufferedImage bufferedImage = java2DFrameConverter.getBufferedImage(frame);
-        byte[] bytes = toByteArray(bufferedImage, "jpg");
+        byte[] bytes = Utils.toByteArray(bufferedImage, "jpg");
         if (bytes == null) {
             return;
         }
@@ -203,18 +197,5 @@ public class GridImageController implements Initializable {
         }
         Tensor<Float> tensor2 = tensorFlowUtils.executeModelFromByteArray(this.owner.graphDef, tensor1);
         this.owner.setImageDescription(tensorFlowUtils.getDescription(null, tensor2, this.owner.allLabels));
-    }
-
-    /**
-     * Convert a bufferedImage to a bytes buffer
-     * @param bufferedImage The source
-     * @param format The format
-     * @return The bytes buffer
-     */
-    public static byte[] toByteArray(BufferedImage bufferedImage, String format) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try { ImageIO.write(bufferedImage, format, baos); }
-        catch (IOException ignored) { return null; }
-        return baos.toByteArray();
     }
 }

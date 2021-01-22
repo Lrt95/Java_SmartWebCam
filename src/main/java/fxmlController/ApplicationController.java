@@ -16,7 +16,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -140,7 +139,6 @@ public class ApplicationController implements Initializable {
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
     private int percentage;
-    private String testLabel;
 
     public void setOwner(Stage value) {
         this.owner = value;
@@ -213,7 +211,8 @@ public class ApplicationController implements Initializable {
     private void toggleSwitchWebCamSelectionChanged() {
         try {
             onToggleClick();
-        } catch (FrameGrabber.Exception ignored) { }
+        } catch (FrameGrabber.Exception ignored) {
+        }
     }
 
     private void sliderPercentageValueChanged(Number newValue) {
@@ -238,7 +237,6 @@ public class ApplicationController implements Initializable {
                 this.labelFilters.put(newValue, new ImageFilterManager(0, 0, 0, 127));
             }
             manager = this.labelFilters.get(newValue);
-            manager.setTestLabel(newValue);
             setDisableFilterEdition(false);
             this.textFieldColorFilter.setText(manager.getColor());
             this.textFieldXPosPicture.setText(Integer.toString(manager.getXPicture()));
@@ -262,7 +260,6 @@ public class ApplicationController implements Initializable {
     private void toggleApplyFilterColorSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-            System.out.println("toggleApplyFilterColorSelectionChanged : " +  this.toggleApplyFilterColor.isSelected());
             manager.setIsFilterColorApply(this.toggleApplyFilterColor.isSelected());
             updateImage();
         }
@@ -271,7 +268,6 @@ public class ApplicationController implements Initializable {
     private void toggleApplyFilterPictureSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-            System.out.println("toggleApplyFilterPictureSelectionChanged : " +  this.toggleApplyFilterPicture.isSelected());
             manager.setIsFilterPictureApply(this.toggleApplyFilterPicture.isSelected());
             updateImage();
 
@@ -281,7 +277,6 @@ public class ApplicationController implements Initializable {
     private void toggleApplyFilterBorderSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-            System.out.println("toggleApplyFilterBorderSelectionChanged : " +  this.toggleApplyFilterBorder.isSelected());
             manager.setIsFilterBorderApply(this.toggleApplyFilterBorder.isSelected());
             updateImage();
         }
@@ -327,15 +322,24 @@ public class ApplicationController implements Initializable {
     }
 
     /**
+     * Call when the WebCam toggle is clicked
+     *
+     * @throws FrameGrabber.Exception if device not found
+     */
+    private void onToggleClick() throws FrameGrabber.Exception {
+        this.resetImageDescription();
+        this.setDisabledWebCam(!this.getDisabledWebCam());
+        if (!this.getDisabledWebCam()) {
+            this.gridImageController.setCam();
+        }
+    }
+
+    /**
      * Check if the user can save the image.
      * Need a folder save, a loaded picture and a picture name.
      */
     private void checkCanSave() {
-        setDisableSave(
-                this.getFolderSave() == null ||
-                        this.allLabelsSelected.size() == 0 ||
-                        this.imageDescription == null
-        );
+        setDisableSave(this.getFolderSave() == null || this.allLabelsSelected.size() == 0 || this.imageDescription == null);
     }
 
     /**
@@ -354,18 +358,11 @@ public class ApplicationController implements Initializable {
     }
 
     /**
-     * Call when the WebCam toggle is clicked
-     *
-     * @throws FrameGrabber.Exception if device not found
+     * Reset image description
      */
-    private void onToggleClick() throws FrameGrabber.Exception {
-        this.resetImageDescription();
-        this.setDisabledWebCam(!this.getDisabledWebCam());
-        if (!this.getDisabledWebCam()) {
-            this.gridImageController.setCam();
-        }
+    public void resetImageDescription() {
+        this.setImageDescription(null);
     }
-
 
     /**
      * EventHandler of the button "Select Picture"
@@ -377,7 +374,12 @@ public class ApplicationController implements Initializable {
      */
     @FXML
     private void selectPictureButtonClick(ActionEvent event) throws IOException {
-        File file = openFile();
+        File file = Utils.openFile(
+            this.owner,
+            "Select a picture to open...",
+            System.getProperty("user.dir") + "/src/main/resources/images",
+            new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg")
+        );
         if (file != null) {
             TensorFlowUtils tensorFlowUtils = new TensorFlowUtils();
             Tensor<Float> tensor = tensorFlowUtils.executeModelFromByteArray(
@@ -390,55 +392,38 @@ public class ApplicationController implements Initializable {
 
     @FXML
     private void selectPictureTamponButtonClick(ActionEvent actionEvent) {
-        File file = openFile();
+        File file = Utils.openFile(
+                this.owner,
+                "Select a picture to open...",
+                System.getProperty("user.dir") + "/src/main/resources/images",
+                new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg", "*.png")
+        );
         if (file != null) {
+            ImageFilterManager.PATH_PICTURE = file.getPath();
             if (!getDisableFilterEdition()) {
                 ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
                 manager.setPathPicture(file.getPath());
-                ImageFilterManager.PATH_PICTURE = file.getPath();
-            }
-            else {
-                ImageFilterManager.PATH_PICTURE = file.getPath();
+                updateImage();
             }
         }
-
     }
 
     @FXML
     private void selectPictureBorderButtonClick(ActionEvent actionEvent) {
-        File file = openFile();
-        if (!getDisableFilterEdition()) {
-            if (file != null) {
+        File file = Utils.openFile(
+                this.owner,
+                "Select a picture to open...",
+                System.getProperty("user.dir") + "/src/main/resources/images",
+                new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg", "*.png")
+        );
+        if (file != null) {
+            ImageFilterManager.PATH_BORDER = file.getPath();
+            if (!getDisableFilterEdition()) {
                 ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
                 manager.setPathBorder(file.getPath());
-                ImageFilterManager.PATH_BORDER = file.getPath();
-            }
-            else {
-                ImageFilterManager.PATH_BORDER = file.getPath();
+                updateImage();
             }
         }
-    }
-
-    /**
-     * Reset image description
-     */
-    public void resetImageDescription() {
-        this.setImageDescription(null);
-    }
-
-    /**
-     * Select a file with a chooser window
-     *
-     * @return The selected file
-     */
-    private File openFile() {
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Select a picture to open...");
-        String sourceFolder = System.getProperty("user.dir") + "/src/main/resources/images";
-        chooser.setInitialDirectory(new File(sourceFolder));
-        FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg", "*.png");
-        chooser.getExtensionFilters().add(fileExtensions);
-        return chooser.showOpenDialog(this.owner);
     }
 
     /**
@@ -450,22 +435,14 @@ public class ApplicationController implements Initializable {
      */
     @FXML
     private void selectSaveFolderButtonClick(ActionEvent event) {
-        File file = openDirectory();
+        File file = Utils.openDirectory(
+                this.owner,
+                "Select a folder to save image...",
+                System.getProperty("user.dir")
+        );
         if (file != null) {
             setFolderSave(file.getPath());
         }
-    }
-
-    /**
-     * Select a folder with a chooser window
-     *
-     * @return The selected folder
-     */
-    private File openDirectory() {
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Select a folder to save image...");
-        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-        return chooser.showDialog(this.owner);
     }
 
     /**

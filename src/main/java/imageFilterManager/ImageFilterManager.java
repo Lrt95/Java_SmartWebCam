@@ -25,16 +25,6 @@ public class ImageFilterManager {
     public static String PATH_PICTURE = "src/main/resources/images/tampon.png";
     public static String PATH_BORDER = "src/main/resources/images/border.png";
 
-    public String getTestLabel() {
-        return testLabel;
-    }
-
-    public void setTestLabel(String testLabel) {
-        this.testLabel = testLabel;
-    }
-
-    private String testLabel;
-
     public ImageFilterManager(int red, int green, int blue, int alpha) {
         this.isFilterColorApply = false;
         this.isFilterBorderApply = false;
@@ -70,7 +60,6 @@ public class ImageFilterManager {
     }
 
     public void setIsFilterColorApply(boolean value) {
-        System.out.println("Label: " + testLabel + " bool isFilterColorApply: " + value);
         this.isFilterColorApply = value;
     }
 
@@ -79,7 +68,6 @@ public class ImageFilterManager {
     }
 
     public void setIsFilterBorderApply(boolean value) {
-        System.out.println("Label: " + testLabel + " bool isFilterBorderApply: " + value);
         this.isFilterBorderApply = value;
     }
 
@@ -88,7 +76,6 @@ public class ImageFilterManager {
     }
 
     public void setIsFilterPictureApply(boolean value) {
-        System.out.println("Label: " + testLabel + " bool setIsFilterPictureApply: " + value);
         this.isFilterPictureApply = value;
     }
 
@@ -137,6 +124,7 @@ public class ImageFilterManager {
     public int getXPicture() {
         return xPicture;
     }
+
     public void setXPicture(int xPicture) {
         this.xPicture = xPicture;
     }
@@ -149,23 +137,15 @@ public class ImageFilterManager {
         this.yPicture = yPicture;
     }
 
-    public String getPathCadre() {
-        return pathBorder;
-    }
-
-    public void setPathCadre(String pathCadre) {
-        this.pathBorder = pathCadre;
-    }
-
     public void setXPictureFromString(String xPicture) {
         try {
-            this.xPicture = Integer.parseInt(xPicture);
+            setXPicture(Integer.parseInt(xPicture));
         } catch (NumberFormatException ignored) {}
     }
 
     public void setYPictureFromString(String yPicture) {
         try {
-            this.yPicture = Integer.parseInt(yPicture);
+            setYPicture(Integer.parseInt(yPicture));
         } catch (NumberFormatException ignored) {}
     }
 
@@ -183,9 +163,7 @@ public class ImageFilterManager {
 
     private void applyColorFilter(BufferedImage bufferedImage) {
         BufferedImage bImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
         Color color = new Color(this.red, this.green, this.blue);
-
         for (int i = 0; i < bImage.getHeight(); i++) {
             for (int j = 0; j < bImage.getWidth(); j++) {
                 bImage.setRGB(j, i, color.getRGB());
@@ -195,7 +173,7 @@ public class ImageFilterManager {
     }
 
     private void applyBorderFilter(BufferedImage bufferedImage) throws IOException {
-        BufferedImage cadreBuffered = ImageIO.read(new File(this.getPathCadre()));
+        BufferedImage cadreBuffered = ImageIO.read(new File(this.getPathBorder()));
         mergeBufferedImage(bufferedImage, cadreBuffered, 1f, 0, 0, true);
     }
 
@@ -217,12 +195,10 @@ public class ImageFilterManager {
 
     private static BufferedImage resize(BufferedImage img, int newW, int newH) {
         java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
-        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = dimg.createGraphics();
+        BufferedImage dImg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = dImg.createGraphics();
         g2d.drawImage(tmp, 0, 0, null);
         g2d.dispose();
-
-        return dimg;
+        return dImg;
     }
 }
