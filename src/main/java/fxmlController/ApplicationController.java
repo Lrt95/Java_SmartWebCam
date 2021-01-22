@@ -142,10 +142,18 @@ public class ApplicationController implements Initializable {
     private List<Webcam> webCams;
     private int deviceSelectedIndex;
 
+    /**
+     * set link parent children
+     * @param value children Component
+     */
     public void setOwner(Stage value) {
         this.owner = value;
     }
 
+    /**
+     * set allLabels in ArrayList
+     * @param value ArrayList
+     */
     public void setAllLabels(ArrayList<String> value) {
         this.allLabels = value;
         fetchAvailableLabels();
@@ -181,6 +189,7 @@ public class ApplicationController implements Initializable {
 
     /**
      * Call after the controller was created.
+     * Initialize all components
      *
      * @param url       Url
      * @param resources Resources
@@ -211,6 +220,7 @@ public class ApplicationController implements Initializable {
             e.printStackTrace();
         }
     }
+
 
     private void updateWebCamDevices() {
         this.webCams = Webcam.getWebcams();
@@ -244,18 +254,26 @@ public class ApplicationController implements Initializable {
         fetchDevicesDetected();
     }
 
+
+    /**
+     * Stop thread cam when exit app
+     */
     public void onExit() {
         if (!getDisabledWebCam()) {
             setDisabledWebCam(true);
         }
     }
 
+    /**
+     * Switch cam on/off
+     */
     private void toggleSwitchWebCamSelectionChanged() {
         try {
             onToggleClick();
         } catch (FrameGrabber.Exception ignored) {
         }
     }
+
 
     public void stopCam() {
         this.toggleSwitchWebCam.setSelected(false);
@@ -274,21 +292,38 @@ public class ApplicationController implements Initializable {
         }
     }
 
+
+    /**
+     * Change min percentage probability detection
+     * @param newValue Number percentage
+     */
     private void sliderPercentageValueChanged(Number newValue) {
         this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
         this.textPercentage.setText(this.percentage + " %");
     }
 
+    /**
+     * Add labels selected
+     * @param newValue String label selected
+     */
     private void comboBoxLabelsAvailableValueChanged(String newValue) {
         addSelectedLabel(newValue);
         checkCanSave();
     }
 
+    /**
+     * Remove labels selected
+     * @param newValue String label deselected
+     */
     private void comboBoxLabelsSelectedValueChanged(String newValue) {
         removeSelectedLabel(newValue);
         checkCanSave();
     }
 
+    /**
+     * Set management filter for label
+     * @param newValue String Label
+     */
     private void comboBoxFilterValueChanged(String newValue) {
         if (newValue != null) {
             ImageFilterManager manager;
@@ -316,6 +351,9 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Apply filter color dynamic
+     */
     private void toggleApplyFilterColorSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
@@ -324,6 +362,9 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Apply stamp dynamic
+     */
     private void toggleApplyFilterPictureSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
@@ -333,6 +374,9 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Apply border dynamic
+     */
     private void toggleApplyFilterBorderSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
@@ -341,6 +385,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Set value rgba for filter color
+     * @param newValue String code rgba
+     */
     private void textFieldColorFilterTextChanged(String newValue) {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
@@ -354,6 +402,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Set position x for stamp
+     * @param newValue String position x
+     */
     private void textFieldXPosPictureTextChanged(String newValue) {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
@@ -367,6 +419,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Set position y for stamp
+     * @param newValue String position y
+     */
     private void textFieldYPosPictureTextChanged(String newValue) {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
@@ -420,6 +476,9 @@ public class ApplicationController implements Initializable {
         checkCanSave();
     }
 
+    /**
+     * Update description when cam on
+     */
     private void updateImage() {
         this.gridImageController.setDescription(this.imageDescription);
     }
@@ -457,6 +516,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Select picture for stamp
+     * @param actionEvent ActionEvent
+     */
     @FXML
     private void selectPictureTamponButtonClick(ActionEvent actionEvent) {
         File file = Utils.openFile(
@@ -475,6 +538,10 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    /**
+     * Select picture for border
+     * @param actionEvent ActionEvent
+     */
     @FXML
     private void selectPictureBorderButtonClick(ActionEvent actionEvent) {
         File file = Utils.openFile(

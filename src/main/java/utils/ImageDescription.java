@@ -7,6 +7,13 @@ public class ImageDescription {
     private final String label;
     private final String path;
 
+    /**
+     * ImageDescription constructor
+     * @param path String path image
+     * @param index int index of detection label
+     * @param probability float best detection probability
+     * @param label String name of detection label
+     */
     public ImageDescription(String path, int index, float probability, String label) {
         this.path = path;
         this.index = index;
