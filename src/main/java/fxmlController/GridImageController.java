@@ -176,7 +176,7 @@ public class GridImageController implements Initializable {
         if (imageDescription != null) {
             HashMap<String , ImageFilterManager> allFilters = this.owner.getLabelFilters();
             if (!allFilters.containsKey(imageDescription.getLabel())) {
-                allFilters.put(imageDescription.getLabel(), new ImageFilterManager(0,0,0,255));
+                allFilters.put(imageDescription.getLabel(), new ImageFilterManager(0,0,0,127));
             }
             ImageFilterManager manager = allFilters.get(this.owner.getImageDescription().getLabel());
             this.setLastBufferedImage(bufferedImage);

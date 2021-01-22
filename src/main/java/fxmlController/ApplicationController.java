@@ -235,7 +235,7 @@ public class ApplicationController implements Initializable {
         if (newValue != null) {
             ImageFilterManager manager;
             if (!this.labelFilters.containsKey(newValue)) {
-                this.labelFilters.put(newValue, new ImageFilterManager(0, 0, 0, 255));
+                this.labelFilters.put(newValue, new ImageFilterManager(0, 0, 0, 127));
             }
             manager = this.labelFilters.get(newValue);
             setDisableFilterEdition(false);
