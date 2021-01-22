@@ -25,6 +25,13 @@ public class ImageFilterManager {
     public static String PATH_PICTURE = "src/main/resources/images/tampon.png";
     public static String PATH_BORDER = "src/main/resources/images/border.png";
 
+    /**
+     * ImageFilterManager Constructor
+     * @param red int value red rgba
+     * @param green int value green rgba
+     * @param blue int value blue rgba
+     * @param alpha int value alpha rgba
+     */
     public ImageFilterManager(int red, int green, int blue, int alpha) {
         this.isFilterColorApply = false;
         this.isFilterBorderApply = false;
@@ -53,6 +60,11 @@ public class ImageFilterManager {
         this.alpha = bounds(alpha);
     }
 
+    /**
+     * Limit of value rgba
+     * @param value int rgba
+     * @return value limited
+     */
     private int bounds(int value) {
         if (value < 0) value = 0;
         if (value > 255) value = 255;
@@ -83,6 +95,10 @@ public class ImageFilterManager {
         return this.isFilterPictureApply;
     }
 
+    /**
+     * Set color from rgba input
+     * @param value String rgba (r,g,b,a)
+     */
     public void setFromString(String value) {
         String[] values = value.split(",");
         if (values.length == 4) {
@@ -149,6 +165,10 @@ public class ImageFilterManager {
         } catch (NumberFormatException ignored) {}
     }
 
+    /**
+     * Apply filters to selected image
+     * @param bufferedImage BufferedImage image selected
+     */
     public void applyFilters(BufferedImage bufferedImage) throws IOException {
         if (this.isFilterColorApply) {
             applyColorFilter(bufferedImage);
@@ -161,6 +181,10 @@ public class ImageFilterManager {
         }
     }
 
+    /**
+     * Apply color filter to selected image with code rgba
+     * @param bufferedImage BufferedImage image selected
+     */
     private void applyColorFilter(BufferedImage bufferedImage) {
         BufferedImage bImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Color color = new Color(this.red, this.green, this.blue);
@@ -172,17 +196,34 @@ public class ImageFilterManager {
         mergeBufferedImage(bufferedImage, bImage, (float)this.alpha / 255, 0, 0, true);
     }
 
+    /**
+     * Apply border filter to selected image
+     * @param bufferedImage BufferedImage image selected
+     */
     private void applyBorderFilter(BufferedImage bufferedImage) throws IOException {
         BufferedImage cadreBuffered = ImageIO.read(new File(this.getPathBorder()));
         mergeBufferedImage(bufferedImage, cadreBuffered, 1f, 0, 0, true);
     }
 
+    /**
+     * Apply stamp filter to selected image
+     * @param bufferedImage BufferedImage image selected with coordinate
+     */
     private void applyPictureFilter(BufferedImage bufferedImage) throws IOException {
         BufferedImage tamponBuffered = resize(ImageIO.read(new File(this.getPathPicture())), 75, 75);
         mergeBufferedImage(bufferedImage, tamponBuffered, 1f, this.getXPicture(), this.getYPicture(), false);
 
     }
 
+    /**
+     * Merge second image to first image
+     * @param firstBuffer BufferedImage first image
+     * @param secondBuffer BufferedImage second image
+     * @param alpha float transparency
+     * @param x int x position second image
+     * @param y int y position second image
+     * @param isResizing activation resize for second image
+     */
     private void mergeBufferedImage(BufferedImage firstBuffer, BufferedImage secondBuffer, float alpha, int x, int y, boolean isResizing) {
         if (isResizing) {
             secondBuffer = resize(secondBuffer, firstBuffer.getWidth(), firstBuffer.getHeight());
@@ -193,6 +234,13 @@ public class ImageFilterManager {
         g2d.dispose();
     }
 
+    /**
+     * Resize image
+     * @param img BufferedImage image
+     * @param newW int width
+     * @param newH int height
+     * @return BufferedImage image resize
+     */
     private static BufferedImage resize(BufferedImage img, int newW, int newH) {
         java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
         BufferedImage dImg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);

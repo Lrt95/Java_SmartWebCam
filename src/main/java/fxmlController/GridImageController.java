@@ -166,6 +166,11 @@ public class GridImageController implements Initializable {
         return SwingFXUtils.toFXImage(bufferedImage, null);
     }
 
+    /**
+     * Build image in bufferedImage
+     * @param bufferedImage BufferedImage
+     * @param imageDescription ImageDescription
+     */
     private void buildImage(BufferedImage bufferedImage, ImageDescription imageDescription) {
         if (imageDescription != null) {
             HashMap<String , ImageFilterManager> allFilters = this.owner.getLabelFilters();
