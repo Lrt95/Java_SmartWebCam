@@ -391,6 +391,8 @@ public class ApplicationController implements Initializable {
         if (!this.getDisabledWebCam()) {
             this.comboBoxDevices.setDisable(true);
             this.gridImageController.setCam();
+        } else {
+            this.comboBoxDevices.setDisable(false);
         }
     }
 
