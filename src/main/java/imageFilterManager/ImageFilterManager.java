@@ -17,6 +17,11 @@ public class ImageFilterManager {
     private boolean isFilterBorderApply;
     private boolean isFilterPictureApply;
 
+    private String pathPicture;
+    private String pathCadre;
+    private int xPicture;
+    private int yPicture;
+
     public ImageFilterManager(int red, int green, int blue, int alpha) {
         this.isFilterColorApply = false;
         this.isFilterBorderApply = false;
@@ -25,6 +30,8 @@ public class ImageFilterManager {
         this.green = green;
         this.blue = blue;
         this.alpha = alpha;
+        this.pathPicture = "src/main/resources/images/tampon.png";
+        this.pathCadre = "src/main/resources/images/cadre.png";
     }
 
     private void setRed(int red) {
@@ -95,15 +102,49 @@ public class ImageFilterManager {
         return this.red + "," + this.green + "," + this.blue + "," + this.alpha;
     }
 
+    public String getPathPicture() {
+        return pathPicture;
+    }
+
+    public void setPathPicture(String pathPicture) {
+        this.pathPicture = pathPicture;
+    }
+
+    public int getxPicture() {
+        return xPicture;
+    }
+
+    public void setxPicture(int xPicture) {
+        this.xPicture = xPicture;
+    }
+
+    public int getyPicture() {
+        return yPicture;
+    }
+
+    public void setyPicture(int yPicture) {
+        this.yPicture = yPicture;
+    }
+
+    public String getPathCadre() {
+        return pathCadre;
+    }
+
+    public void setPathCadre(String pathCadre) {
+        this.pathCadre = pathCadre;
+    }
+
+
+
     public void applyFilters(BufferedImage bufferedImage) throws IOException {
         if (this.isFilterColorApply) {
             applyColorFilter(bufferedImage);
         }
-        if (this.isFilterBorderApply) {
-            applyBorderFilter(bufferedImage);
-        }
         if (this.isFilterPictureApply){
             applyPictureFilter(bufferedImage);
+        }
+        if (this.isFilterBorderApply) {
+            applyBorderFilter(bufferedImage);
         }
     }
 
@@ -117,26 +158,27 @@ public class ImageFilterManager {
                 bImage.setRGB(j, i, color.getRGB());
             }
         }
-        mergeBufferedImage(bufferedImage, bImage, (float)this.alpha / 255);
+        mergeBufferedImage(bufferedImage, bImage, (float)this.alpha / 255, 0, 0, true);
     }
 
     private void applyBorderFilter(BufferedImage bufferedImage) throws IOException {
-        BufferedImage cadreBuffered = ImageIO.read(new File("src/main/resources/images/cadre.png"));
-        mergeBufferedImage(bufferedImage, cadreBuffered, 1f);
+        BufferedImage cadreBuffered = ImageIO.read(new File(this.getPathCadre()));
+        mergeBufferedImage(bufferedImage, cadreBuffered, 1f, 0, 0, true);
     }
 
-    private void applyPictureFilter(BufferedImage bufferedImage) {
+    private void applyPictureFilter(BufferedImage bufferedImage) throws IOException {
+        BufferedImage tamponBuffered = resize(ImageIO.read(new File(this.getPathPicture())), 75, 75);
+        mergeBufferedImage(bufferedImage, tamponBuffered, 1f, this.getxPicture(), this.getyPicture(), false);
 
     }
 
-    private void mergeBufferedImage(BufferedImage bufferedImage, BufferedImage cadreBuffered, float alpha) {
-        BufferedImage cadreResize = resize(cadreBuffered, bufferedImage.getWidth(), bufferedImage.getHeight());
+    private void mergeBufferedImage(BufferedImage bufferedImage, BufferedImage cadreBuffered, float alpha, int x, int y, boolean isResizing) {
+        if (isResizing) {
+            cadreBuffered = resize(cadreBuffered, bufferedImage.getWidth(), bufferedImage.getHeight());
+        }
         Graphics2D g2d = bufferedImage.createGraphics();
         g2d.setComposite(AlphaComposite.SrcOver.derive(alpha));
-        int x = (bufferedImage.getWidth() - cadreResize.getWidth()) / 2;
-        int y = (bufferedImage.getHeight() - cadreResize.getHeight()) / 2;
-
-        g2d.drawImage(cadreResize, x, y, null);
+        g2d.drawImage(cadreBuffered, x, y, null);
         g2d.dispose();
     }
 

@@ -38,6 +38,11 @@ import saveImage.SaveImage;
 import imageFilterManager.ImageFilterManager;
 
 public class ApplicationController implements Initializable {
+
+    @FXML
+    private TextField yPosPicture;
+    @FXML
+    private TextField xPosPicture;
     @FXML
     private ToggleSwitch toggleSwitchWebCam;
     @FXML
