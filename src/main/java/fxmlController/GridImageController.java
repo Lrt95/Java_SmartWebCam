@@ -49,7 +49,6 @@ public class GridImageController implements Initializable {
     private Timer timerCamDescription;
     private int timerDelay;
 
-
     public void setOwner(ApplicationController owner) {
         this.owner = owner;
     }
@@ -109,7 +108,7 @@ public class GridImageController implements Initializable {
      * @throws FrameGrabber.Exception if the device was not found
      */
     public void setCam() throws FrameGrabber.Exception {
-        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
+        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(this.owner.getDeviceSelectedIndex());
         grabber.start();
 
         timerDelay = this.owner.getSpinnerTime();
@@ -127,7 +126,13 @@ public class GridImageController implements Initializable {
                     this.frame = grabber.grabFrame();
                     setFrameToImageView(this.frame);
                 } catch (IOException e) {
-                    System.out.println("Error during WebCam thread.");
+                    this.owner.stopCam();
+                    try {
+                        grabber.stop();
+                        grabber.close();
+                    } catch (FrameGrabber.Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
             try {

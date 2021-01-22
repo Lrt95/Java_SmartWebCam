@@ -7,10 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -39,6 +36,8 @@ public class ApplicationController implements Initializable {
 
     @FXML
     private ToggleSwitch toggleSwitchWebCam;
+    @FXML
+    private ComboBox<String> comboBoxDevices;
     @FXML
     private GridPane gridImage;
     @FXML
@@ -140,6 +139,8 @@ public class ApplicationController implements Initializable {
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
     private int percentage;
+    private List<Webcam> webCams;
+    private int deviceSelectedIndex;
 
     public void setOwner(Stage value) {
         this.owner = value;
@@ -159,6 +160,13 @@ public class ApplicationController implements Initializable {
         return Integer.parseInt(this.spinnerTime.getValue().toString()) * 1000;
     }
 
+    private void setDeviceSelectedIndex(int value) {
+        this.deviceSelectedIndex = value;
+    }
+    public int getDeviceSelectedIndex() {
+        return this.deviceSelectedIndex;
+    }
+
     /**
      * ApplicationController constructor
      */
@@ -169,8 +177,6 @@ public class ApplicationController implements Initializable {
         this.disabledWebCam = new SimpleBooleanProperty(true);
         this.disableFilterEdition = new SimpleBooleanProperty(true);
         this.allLabelsSelected = new ArrayList<>();
-
-        List<Webcam> wb = Webcam.getWebcams();
     }
 
     /**
@@ -181,6 +187,7 @@ public class ApplicationController implements Initializable {
      */
     public void initialize(URL url, ResourceBundle resources) {
         this.toggleSwitchWebCam.selectedProperty().addListener((observable, oldValue, newValue) -> toggleSwitchWebCamSelectionChanged());
+        this.comboBoxDevices.valueProperty().addListener((observable, oldValue, newValue) -> comboBoxDevicesValueChanged(newValue));
         this.sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> sliderPercentageValueChanged(newValue));
         this.comboBoxLabelsAvailable.getEditor().textProperty().addListener((observable, oldValue, newValue) -> fetchAvailableLabels());
         this.comboBoxLabelsAvailable.valueProperty().addListener((observable, oldValue, newValue) -> comboBoxLabelsAvailableValueChanged(newValue));
@@ -192,7 +199,7 @@ public class ApplicationController implements Initializable {
         this.textFieldColorFilter.textProperty().addListener(((observable, oldValue, newValue) -> textFieldColorFilterTextChanged(newValue)));
         this.textFieldXPosPicture.textProperty().addListener((observable, oldValue, newValue) -> textFieldXPosPictureTextChanged(newValue));
         this.textFieldYPosPicture.textProperty().addListener((observable, oldValue, newValue) -> textFieldYPosPictureTextChanged(newValue));
-
+        updateWebCamDevices();
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/imagePanel.fxml"));
         try {
@@ -205,6 +212,38 @@ public class ApplicationController implements Initializable {
         }
     }
 
+    private void updateWebCamDevices() {
+        this.webCams = Webcam.getWebcams();
+        switch (this.webCams.size()) {
+            case 0 -> {
+                this.toggleSwitchWebCam.setDisable(true);
+                this.comboBoxDevices.setVisible(false);
+                setDeviceSelectedIndex(-1);
+                if (!getDisabledWebCam()) {
+                    setDisabledWebCam(true);
+                    this.resetImageDescription();
+                }
+            }
+            case 1 -> {
+                this.toggleSwitchWebCam.setDisable(false);
+                this.comboBoxDevices.setVisible(false);
+                setDeviceSelectedIndex(0);
+            }
+            default -> {
+                this.toggleSwitchWebCam.setDisable(false);
+                this.comboBoxDevices.setVisible(true);
+                if (getDeviceSelectedIndex() >= this.webCams.size()) {
+                    setDeviceSelectedIndex(0);
+                    this.resetImageDescription();
+                }
+                if (!getDisabledWebCam()) {
+                    this.comboBoxDevices.setDisable(true);
+                }
+            }
+        }
+        fetchDevicesDetected();
+    }
+
     public void onExit() {
         if (!getDisabledWebCam()) {
             setDisabledWebCam(true);
@@ -215,6 +254,23 @@ public class ApplicationController implements Initializable {
         try {
             onToggleClick();
         } catch (FrameGrabber.Exception ignored) {
+        }
+    }
+
+    public void stopCam() {
+        this.toggleSwitchWebCam.setSelected(false);
+    }
+
+    private void comboBoxDevicesValueChanged(String newValue) {
+        int i;
+        for (i = 0; i < this.webCams.size(); i++) {
+            if (this.webCams.get(i).getName().equals(newValue)) {
+                setDeviceSelectedIndex(i);
+                break;
+            }
+        }
+        if (i == this.webCams.size()) {
+            setDeviceSelectedIndex(-1);
         }
     }
 
@@ -333,8 +389,14 @@ public class ApplicationController implements Initializable {
         this.resetImageDescription();
         this.setDisabledWebCam(!this.getDisabledWebCam());
         if (!this.getDisabledWebCam()) {
+            this.comboBoxDevices.setDisable(true);
             this.gridImageController.setCam();
         }
+    }
+
+    @FXML
+    private void refreshDevicesButtonClick(ActionEvent actionEvent) {
+        updateWebCamDevices();
     }
 
     /**
@@ -519,5 +581,15 @@ public class ApplicationController implements Initializable {
             this.comboBoxLabelsSelected.getItems().add(label);
         }
         this.comboBoxLabelsSelected.setPromptText("Labels selected (" + this.comboBoxLabelsSelected.getItems().size() + ")");
+    }
+
+    /**
+     * Feed the comboBox of the detected devices.
+     */
+    private void fetchDevicesDetected() {
+        this.comboBoxDevices.getItems().clear();
+        for (Webcam webcam : this.webCams) {
+            this.comboBoxDevices.getItems().add(webcam.getName());
+        }
     }
 }

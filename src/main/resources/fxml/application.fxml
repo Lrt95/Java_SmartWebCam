@@ -38,9 +38,17 @@
                 <RowConstraints minHeight="10.0" prefHeight="100.0"/>
             </rowConstraints>
             <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="100.0"/>
+                <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                <ColumnConstraints minWidth="10.0" percentWidth="60.0"/>
             </columnConstraints>
-            <ToggleSwitch GridPane.rowIndex="0" text="WebCam" fx:id="toggleSwitchWebCam" selected="false"/>
+            <ToggleSwitch GridPane.columnIndex="0" text="WebCam" fx:id="toggleSwitchWebCam" selected="false"/>
+            <Button GridPane.columnIndex="1" text="Refresh devices" onAction="#refreshDevicesButtonClick" />
+            <ComboBox GridPane.columnIndex="2" fx:id="comboBoxDevices" promptText="Selected Device">
+                <items>
+                    <FXCollections fx:factory="observableArrayList"/>
+                </items>
+            </ComboBox>
         </GridPane>
 
         <GridPane GridPane.rowIndex="1" hgap="10" vgap="10" visible="${controller.disabledWebCam}">
