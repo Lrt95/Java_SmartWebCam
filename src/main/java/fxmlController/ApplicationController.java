@@ -1,7 +1,6 @@
 package fxmlController;
 
 import javafx.beans.property.*;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +16,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -26,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bytedeco.javacv.FrameGrabber;
-import org.bytedeco.javacv.Java2DFrameConverter;
 import org.controlsfx.control.ToggleSwitch;
 import org.tensorflow.Tensor;
 
@@ -39,10 +36,6 @@ import imageFilterManager.ImageFilterManager;
 
 public class ApplicationController implements Initializable {
 
-    @FXML
-    private TextField yPosPicture;
-    @FXML
-    private TextField xPosPicture;
     @FXML
     private ToggleSwitch toggleSwitchWebCam;
     @FXML
@@ -69,6 +62,11 @@ public class ApplicationController implements Initializable {
     private ComboBox<String> comboBoxFilter;
     @FXML
     private TextField textFieldColorFilter;
+    @FXML
+    private TextField textFieldXPosPicture;
+    @FXML
+    private TextField textFieldYPosPicture;
+
 
     private final StringProperty folderSave;
 
@@ -135,7 +133,6 @@ public class ApplicationController implements Initializable {
         return labelFilters;
     }
 
-    private final String OS;
     private Stage owner;
     public ArrayList<String> allLabels;
     private final ArrayList<String> allLabelsSelected;
@@ -163,16 +160,11 @@ public class ApplicationController implements Initializable {
         return Integer.parseInt(this.spinnerTime.getValue().toString()) * 1000;
     }
 
-    public String getOS() {
-        return this.OS;
-    }
-
     /**
      * ApplicationController constructor
      */
     public ApplicationController() {
-        this.OS = System.getProperty("os.name").toLowerCase();
-        this.labelFilters = new HashMap<String, ImageFilterManager>();
+        this.labelFilters = new HashMap<>();
         this.folderSave = new SimpleStringProperty(null);
         this.disableSave = new SimpleBooleanProperty(true);
         this.disabledWebCam = new SimpleBooleanProperty(true);
@@ -187,85 +179,151 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL url, ResourceBundle resources) {
-        this.sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> {
-            this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
-            this.textPercentage.setText(this.percentage + " %");
-        });
+        this.toggleSwitchWebCam.selectedProperty().addListener((observable, oldValue, newValue) -> toggleSwitchWebCamSelectionChanged());
+        this.sliderPercentage.valueProperty().addListener((observable, oldValue, newValue) -> sliderPercentageValueChanged(newValue));
         this.comboBoxLabelsAvailable.getEditor().textProperty().addListener((observable, oldValue, newValue) -> fetchAvailableLabels());
-        this.comboBoxLabelsAvailable.valueProperty().addListener((observable, oldValue, newValue) -> {
-            addSelectedLabel(newValue);
-            checkCanSave();
-        });
-        this.comboBoxLabelsSelected.valueProperty().addListener((observable, oldValue, newValue) -> {
-            removeSelectedLabel(newValue);
-            checkCanSave();
-        });
-
-        //this.comboBoxFilter.getEditor().textProperty().addListener((observable, oldValue, newValue) -> fetchFilters());
-        this.comboBoxFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                ImageFilterManager manager;
-                if (!this.labelFilters.containsKey(newValue)) {
-                    this.labelFilters.put(newValue, new ImageFilterManager(0, 0, 0, 255));
-                }
-                manager = this.labelFilters.get(newValue);
-                setDisableFilterEdition(false);
-                this.textFieldColorFilter.setText(manager.getColor());
-                this.toggleApplyFilterColor.setSelected(manager.getIsFilterColorApply());
-                this.toggleApplyFilterBorder.setSelected(manager.getIsFilterBorderApply());
-                this.toggleApplyFilterPicture.setSelected(manager.getIsFilterPictureApply());
-
-            } else {
-                setDisableFilterEdition(true);
-                this.toggleApplyFilterColor.setSelected(false);
-                this.toggleApplyFilterBorder.setSelected(false);
-                this.toggleApplyFilterPicture.setSelected(false);
-            }
-        });
-        this.toggleApplyFilterColor.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!getDisableFilterEdition()) {
-                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-                manager.setIsFilterColorApply(!manager.getIsFilterColorApply());
-            }
-        });
-        this.toggleApplyFilterPicture.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!getDisableFilterEdition()) {
-                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-                manager.setIsFilterPictureApply(!manager.getIsFilterPictureApply());
-            }
-        });
-        this.toggleApplyFilterBorder.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!getDisableFilterEdition()) {
-                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-                manager.setIsFilterBorderApply(!manager.getIsFilterBorderApply());
-            }
-        });
-        this.textFieldColorFilter.textProperty().addListener(((observable, oldValue, newValue) -> {
-            if (!getDisableFilterEdition()) {
-                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-                manager.setFromString(newValue);
-                if (!manager.getColor().equals(newValue)) {
-                    this.textFieldColorFilter.setText(manager.getColor());
-                }
-            }
-        }));
-
-        this.toggleSwitchWebCam.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            try {
-                onToggleClick();
-            } catch (FrameGrabber.Exception ignored) {
-            }
-        });
+        this.comboBoxLabelsAvailable.valueProperty().addListener((observable, oldValue, newValue) -> comboBoxLabelsAvailableValueChanged(newValue));
+        this.comboBoxLabelsSelected.valueProperty().addListener((observable, oldValue, newValue) -> comboBoxLabelsSelectedValueChanged(newValue));
+        this.comboBoxFilter.valueProperty().addListener((observable, oldValue, newValue) -> comboBoxFilterValueChanged(newValue));
+        this.toggleApplyFilterColor.selectedProperty().addListener((observable, oldValue, newValue) -> toggleApplyFilterColorSelectionChanged());
+        this.toggleApplyFilterPicture.selectedProperty().addListener((observable, oldValue, newValue) -> toggleApplyFilterPictureSelectionChanged());
+        this.toggleApplyFilterBorder.selectedProperty().addListener((observable, oldValue, newValue) -> toggleApplyFilterBorderSelectionChanged());
+        this.textFieldColorFilter.textProperty().addListener(((observable, oldValue, newValue) -> textFieldColorFilterTextChanged(newValue)));
+        this.textFieldXPosPicture.textProperty().addListener((observable, oldValue, newValue) -> textFieldXPosPictureTextChanged(newValue));
+        this.textFieldYPosPicture.textProperty().addListener((observable, oldValue, newValue) -> textFieldYPosPictureTextChanged(newValue));
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/fxml/imagePanel.fxml"));
         try {
             Parent children = loader.load();
             this.gridImage.getChildren().add(children);
-            this.gridImageController = loader.<GridImageController>getController();
+            this.gridImageController = loader.getController();
             this.gridImageController.setOwner(this);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void onExit() {
+        if (!getDisabledWebCam()) {
+            setDisabledWebCam(true);
+        }
+    }
+
+    private void toggleSwitchWebCamSelectionChanged() {
+        try {
+            onToggleClick();
+        } catch (FrameGrabber.Exception ignored) { }
+    }
+
+    private void sliderPercentageValueChanged(Number newValue) {
+        this.percentage = Integer.parseInt(newValue.toString().split("\\.")[0]);
+        this.textPercentage.setText(this.percentage + " %");
+    }
+
+    private void comboBoxLabelsAvailableValueChanged(String newValue) {
+        addSelectedLabel(newValue);
+        checkCanSave();
+    }
+
+    private void comboBoxLabelsSelectedValueChanged(String newValue) {
+        removeSelectedLabel(newValue);
+        checkCanSave();
+    }
+
+    private void comboBoxFilterValueChanged(String newValue) {
+        if (newValue != null) {
+            ImageFilterManager manager;
+            if (!this.labelFilters.containsKey(newValue)) {
+                this.labelFilters.put(newValue, new ImageFilterManager(0, 0, 0, 255));
+            }
+            manager = this.labelFilters.get(newValue);
+            setDisableFilterEdition(false);
+            this.textFieldColorFilter.setText(manager.getColor());
+            this.textFieldXPosPicture.setText(Integer.toString(manager.getXPicture()));
+            this.textFieldYPosPicture.setText(Integer.toString(manager.getYPicture()));
+
+            this.toggleApplyFilterColor.setSelected(manager.getIsFilterColorApply());
+            this.toggleApplyFilterBorder.setSelected(manager.getIsFilterBorderApply());
+            this.toggleApplyFilterPicture.setSelected(manager.getIsFilterPictureApply());
+
+        } else {
+            setDisableFilterEdition(true);
+            this.textFieldColorFilter.setText("");
+            this.textFieldXPosPicture.setText("");
+            this.textFieldYPosPicture.setText("");
+            this.toggleApplyFilterColor.setSelected(false);
+            this.toggleApplyFilterBorder.setSelected(false);
+            this.toggleApplyFilterPicture.setSelected(false);
+        }
+    }
+
+    private void toggleApplyFilterColorSelectionChanged() {
+        if (!getDisableFilterEdition()) {
+            ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+            manager.setIsFilterColorApply(!manager.getIsFilterColorApply());
+            if (manager.getIsFilterColorApply()) {
+                updateImage();
+            }
+        }
+    }
+
+    private void toggleApplyFilterPictureSelectionChanged() {
+        if (!getDisableFilterEdition()) {
+            ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+            manager.setIsFilterPictureApply(!manager.getIsFilterPictureApply());
+            if (manager.getIsFilterPictureApply()) {
+                updateImage();
+            }
+        }
+    }
+
+    private void toggleApplyFilterBorderSelectionChanged() {
+        if (!getDisableFilterEdition()) {
+            ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+            manager.setIsFilterBorderApply(!manager.getIsFilterBorderApply());
+            if (manager.getIsFilterBorderApply()) {
+                updateImage();
+            }
+        }
+    }
+
+    private void textFieldColorFilterTextChanged(String newValue) {
+        if (!getDisableFilterEdition()) {
+            ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+            manager.setFromString(newValue);
+            if (!manager.getColor().equals(newValue)) {
+                this.textFieldColorFilter.setText(manager.getColor());
+            }
+            if (manager.getIsFilterColorApply()) {
+                updateImage();
+            }
+        }
+    }
+
+    private void textFieldXPosPictureTextChanged(String newValue) {
+        if (!getDisableFilterEdition()) {
+            ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+            manager.setXPictureFromString(newValue);
+            if (!Integer.toString(manager.getXPicture()).equals(newValue)) {
+                this.textFieldXPosPicture.setText(Integer.toString(manager.getXPicture()));
+            }
+            if (manager.getIsFilterPictureApply()) {
+                updateImage();
+            }
+        }
+    }
+
+    private void textFieldYPosPictureTextChanged(String newValue) {
+        if (!getDisableFilterEdition()) {
+            ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+            manager.setYPictureFromString(newValue);
+            if (!Integer.toString(manager.getYPicture()).equals(newValue)) {
+                this.textFieldYPosPicture.setText(Integer.toString(manager.getYPicture()));
+            }
+            if (manager.getIsFilterPictureApply()) {
+                updateImage();
+            }
         }
     }
 
@@ -289,9 +347,27 @@ public class ApplicationController implements Initializable {
     public void setImageDescription(ImageDescription imageDescription) {
         this.imageDescription = imageDescription;
         this.textPath.setText(imageDescription != null ? "Path: " + this.imageDescription.getPath() : "Path: ");
-        this.gridImageController.setDescription(this.imageDescription);
+        updateImage();
         checkCanSave();
     }
+
+    private void updateImage() {
+        this.gridImageController.setDescription(this.imageDescription);
+    }
+
+    /**
+     * Call when the WebCam toggle is clicked
+     *
+     * @throws FrameGrabber.Exception if device not found
+     */
+    private void onToggleClick() throws FrameGrabber.Exception {
+        this.resetImageDescription();
+        this.setDisabledWebCam(!this.getDisabledWebCam());
+        if (!this.getDisabledWebCam()) {
+            this.gridImageController.setCam();
+        }
+    }
+
 
     /**
      * EventHandler of the button "Select Picture"
@@ -314,16 +390,34 @@ public class ApplicationController implements Initializable {
         }
     }
 
-    /**
-     * Call when the WebCam toggle is clicked
-     *
-     * @throws FrameGrabber.Exception if device not found
-     */
-    private void onToggleClick() throws FrameGrabber.Exception {
-        this.resetImageDescription();
-        this.setDisabledWebCam(!this.getDisabledWebCam());
-        if (!this.getDisabledWebCam()) {
-            this.gridImageController.setCam();
+    @FXML
+    private void selectPictureTamponButtonClick(ActionEvent actionEvent) {
+        File file = openFile();
+        if (file != null) {
+            if (!getDisableFilterEdition()) {
+                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                manager.setPathPicture(file.getPath());
+                ImageFilterManager.PATH_PICTURE = file.getPath();
+            }
+            else {
+                ImageFilterManager.PATH_PICTURE = file.getPath();
+            }
+        }
+
+    }
+
+    @FXML
+    private void selectPictureBorderButtonClick(ActionEvent actionEvent) {
+        File file = openFile();
+        if (!getDisableFilterEdition()) {
+            if (file != null) {
+                ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
+                manager.setPathBorder(file.getPath());
+                ImageFilterManager.PATH_BORDER = file.getPath();
+            }
+            else {
+                ImageFilterManager.PATH_BORDER = file.getPath();
+            }
         }
     }
 
@@ -344,7 +438,7 @@ public class ApplicationController implements Initializable {
         chooser.setTitle("Select a picture to open...");
         String sourceFolder = System.getProperty("user.dir") + "/src/main/resources/images";
         chooser.setInitialDirectory(new File(sourceFolder));
-        FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg");
+        FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Pictures", "*.jpg", "*.jpeg", "*.png");
         chooser.getExtensionFilters().add(fileExtensions);
         return chooser.showOpenDialog(this.owner);
     }

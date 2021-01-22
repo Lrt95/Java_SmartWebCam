@@ -190,12 +190,14 @@
             <GridPane GridPane.rowIndex="3" hgap="10" vgap="10">
                 <columnConstraints>
                     <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="85.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="70.0" />
                 </columnConstraints>
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" percentHeight="100.0" />
                 </rowConstraints>
                 <ToggleSwitch GridPane.columnIndex="0" text="Border :" fx:id="toggleApplyFilterBorder" selected="false"/>
+                <Button       GridPane.columnIndex="1" text="Select border" onAction="#selectPictureBorderButtonClick"/>
             </GridPane>
 
             <GridPane GridPane.rowIndex="4" hgap="10" vgap="10">
@@ -209,9 +211,9 @@
                     <RowConstraints minHeight="10.0" percentHeight="100.0" />
                 </rowConstraints>
                 <ToggleSwitch GridPane.columnIndex="0" text="Picture :" fx:id="toggleApplyFilterPicture" selected="false"/>
-                <TextField    GridPane.columnIndex="1" promptText="x" fx:id="xPosPicture"/>
-                <TextField    GridPane.columnIndex="2" promptText="y" fx:id="yPosPicture"/>
-                <Button       GridPane.columnIndex="3" text="Select picture" />
+                <TextField    GridPane.columnIndex="1" promptText="x" fx:id="textFieldXPosPicture"/>
+                <TextField    GridPane.columnIndex="2" promptText="y" fx:id="textFieldYPosPicture"/>
+                <Button       GridPane.columnIndex="3" text="Select picture" onAction="#selectPictureTamponButtonClick"/>
             </GridPane>
         </GridPane>
 

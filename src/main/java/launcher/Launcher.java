@@ -34,7 +34,10 @@ public class Launcher extends Application {
         loader.setLocation(getClass().getResource("/fxml/application.fxml"));
         Parent root = loader.load();
 
-        ApplicationController controller = loader.<ApplicationController>getController();
+        ApplicationController controller = loader.getController();
+
+        primaryStage.setOnCloseRequest(we -> controller.onExit());
+
         controller.setOwner(primaryStage);
         controller.setAllLabels(allLabels);
         controller.setGraphDef(graphDef);
