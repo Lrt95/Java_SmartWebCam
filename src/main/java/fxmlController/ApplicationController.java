@@ -40,8 +40,6 @@ public class ApplicationController implements Initializable {
     @FXML
     private ToggleSwitch toggleSwitchWebCam;
     @FXML
-    private Text textPath;
-    @FXML
     private GridPane gridImage;
     @FXML
     private Slider sliderPercentage;
@@ -347,7 +345,6 @@ public class ApplicationController implements Initializable {
      */
     public void setImageDescription(ImageDescription imageDescription) {
         this.imageDescription = imageDescription;
-        this.textPath.setText(imageDescription != null ? "Path: " + this.imageDescription.getPath() : "Path: ");
         updateImage();
         checkCanSave();
     }
