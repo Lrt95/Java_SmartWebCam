@@ -1,5 +1,6 @@
 package fxmlController;
 
+import com.github.sarxos.webcam.Webcam;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,12 +13,12 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
@@ -168,6 +169,8 @@ public class ApplicationController implements Initializable {
         this.disabledWebCam = new SimpleBooleanProperty(true);
         this.disableFilterEdition = new SimpleBooleanProperty(true);
         this.allLabelsSelected = new ArrayList<>();
+
+        List<Webcam> wb = Webcam.getWebcams();
     }
 
     /**
