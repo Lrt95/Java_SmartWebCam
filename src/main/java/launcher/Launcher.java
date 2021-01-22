@@ -9,10 +9,13 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import utils.Utils;
+
+import javax.imageio.ImageIO;
 
 public class Launcher extends Application {
 
@@ -45,8 +48,9 @@ public class Launcher extends Application {
 
         Scene scene = new Scene(root);
         primaryStage.setTitle("Smart WebCam");
-        //primaryStage.getIcons().add(new Image("file:icon.png"));
-        //primaryStage.getIcons().add(new Image(getClass().getResource()));
+        String separator = System.getProperty("os.name").toLowerCase().contains("win") ? "/" : "//";
+        String srcIcon = System.getProperty("user.dir") + "/src/main/resources/images/webcam-icon.png";
+        primaryStage.getIcons().add(new Image("file:" + separator + srcIcon));
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
