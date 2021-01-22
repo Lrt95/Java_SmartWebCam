@@ -25,6 +25,16 @@ public class ImageFilterManager {
     public static String PATH_PICTURE = "src/main/resources/images/tampon.png";
     public static String PATH_BORDER = "src/main/resources/images/border.png";
 
+    public String getTestLabel() {
+        return testLabel;
+    }
+
+    public void setTestLabel(String testLabel) {
+        this.testLabel = testLabel;
+    }
+
+    private String testLabel;
+
     public ImageFilterManager(int red, int green, int blue, int alpha) {
         this.isFilterColorApply = false;
         this.isFilterBorderApply = false;
@@ -60,6 +70,7 @@ public class ImageFilterManager {
     }
 
     public void setIsFilterColorApply(boolean value) {
+        System.out.println("Label: " + testLabel + " bool isFilterColorApply: " + value);
         this.isFilterColorApply = value;
     }
 
@@ -68,6 +79,7 @@ public class ImageFilterManager {
     }
 
     public void setIsFilterBorderApply(boolean value) {
+        System.out.println("Label: " + testLabel + " bool isFilterBorderApply: " + value);
         this.isFilterBorderApply = value;
     }
 
@@ -76,6 +88,7 @@ public class ImageFilterManager {
     }
 
     public void setIsFilterPictureApply(boolean value) {
+        System.out.println("Label: " + testLabel + " bool setIsFilterPictureApply: " + value);
         this.isFilterPictureApply = value;
     }
 

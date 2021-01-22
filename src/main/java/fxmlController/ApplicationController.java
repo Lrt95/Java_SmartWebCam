@@ -16,6 +16,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -141,6 +142,7 @@ public class ApplicationController implements Initializable {
     private ImageDescription imageDescription;
     private GridImageController gridImageController;
     private int percentage;
+    private String testLabel;
 
     public void setOwner(Stage value) {
         this.owner = value;
@@ -238,6 +240,7 @@ public class ApplicationController implements Initializable {
                 this.labelFilters.put(newValue, new ImageFilterManager(0, 0, 0, 127));
             }
             manager = this.labelFilters.get(newValue);
+            manager.setTestLabel(newValue);
             setDisableFilterEdition(false);
             this.textFieldColorFilter.setText(manager.getColor());
             this.textFieldXPosPicture.setText(Integer.toString(manager.getXPicture()));
@@ -261,30 +264,28 @@ public class ApplicationController implements Initializable {
     private void toggleApplyFilterColorSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-            manager.setIsFilterColorApply(!manager.getIsFilterColorApply());
-            if (manager.getIsFilterColorApply()) {
-                updateImage();
-            }
+            System.out.println("toggleApplyFilterColorSelectionChanged : " +  this.toggleApplyFilterColor.isSelected());
+            manager.setIsFilterColorApply(this.toggleApplyFilterColor.isSelected());
+            updateImage();
         }
     }
 
     private void toggleApplyFilterPictureSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-            manager.setIsFilterPictureApply(!manager.getIsFilterPictureApply());
-            if (manager.getIsFilterPictureApply()) {
-                updateImage();
-            }
+            System.out.println("toggleApplyFilterPictureSelectionChanged : " +  this.toggleApplyFilterPicture.isSelected());
+            manager.setIsFilterPictureApply(this.toggleApplyFilterPicture.isSelected());
+            updateImage();
+
         }
     }
 
     private void toggleApplyFilterBorderSelectionChanged() {
         if (!getDisableFilterEdition()) {
             ImageFilterManager manager = this.labelFilters.get(this.comboBoxFilter.getValue());
-            manager.setIsFilterBorderApply(!manager.getIsFilterBorderApply());
-            if (manager.getIsFilterBorderApply()) {
-                updateImage();
-            }
+            System.out.println("toggleApplyFilterBorderSelectionChanged : " +  this.toggleApplyFilterBorder.isSelected());
+            manager.setIsFilterBorderApply(this.toggleApplyFilterBorder.isSelected());
+            updateImage();
         }
     }
 

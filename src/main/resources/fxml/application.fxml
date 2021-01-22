@@ -12,95 +12,95 @@
           prefHeight="720" prefWidth="1280"
           hgap="10" vgap="10">
     <columnConstraints>
-        <ColumnConstraints minWidth="10.0" percentWidth="01.0" />
-        <ColumnConstraints minWidth="10.0" percentWidth="49.0" />
-        <ColumnConstraints minWidth="10.0" percentWidth="49.0" />
-        <ColumnConstraints minWidth="10.0" percentWidth="01.0" />
+        <ColumnConstraints minWidth="10.0" percentWidth="01.0"/>
+        <ColumnConstraints minWidth="10.0" percentWidth="49.0"/>
+        <ColumnConstraints minWidth="10.0" percentWidth="49.0"/>
+        <ColumnConstraints minWidth="10.0" percentWidth="01.0"/>
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints minHeight="10.0" percentHeight="05.0" />
-        <RowConstraints minHeight="10.0" percentHeight="90.0" />
-        <RowConstraints minHeight="10.0" percentHeight="05.0" />
+        <RowConstraints minHeight="10.0" percentHeight="05.0"/>
+        <RowConstraints minHeight="10.0" percentHeight="90.0"/>
+        <RowConstraints minHeight="10.0" percentHeight="05.0"/>
     </rowConstraints>
 
-    <GridPane GridPane.rowIndex="1" GridPane.columnIndex="1" hgap="10" vgap="10" >
+    <GridPane GridPane.rowIndex="1" GridPane.columnIndex="1" hgap="10" vgap="10">
         <columnConstraints>
-            <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
+            <ColumnConstraints minWidth="10.0" percentWidth="100.0"/>
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints minHeight="10.0" percentHeight="03.0" />
-            <RowConstraints minHeight="10.0" percentHeight="10.0" />
-            <RowConstraints minHeight="10.0" percentHeight="87.0" />
+            <RowConstraints minHeight="10.0" percentHeight="03.0"/>
+            <RowConstraints minHeight="10.0" percentHeight="10.0"/>
+            <RowConstraints minHeight="10.0" percentHeight="87.0"/>
         </rowConstraints>
 
-        <GridPane GridPane.rowIndex="0" hgap="10" vgap="10" >
+        <GridPane GridPane.rowIndex="0" hgap="10" vgap="10">
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="100.0" />
+                <RowConstraints minHeight="10.0" prefHeight="100.0"/>
             </rowConstraints>
             <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="100.0"/>
             </columnConstraints>
             <ToggleSwitch GridPane.rowIndex="0" text="WebCam" fx:id="toggleSwitchWebCam" selected="false"/>
         </GridPane>
 
         <GridPane GridPane.rowIndex="1" hgap="10" vgap="10" visible="${controller.disabledWebCam}">
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="100.0" />
+                <RowConstraints minHeight="10.0" prefHeight="100.0"/>
             </rowConstraints>
             <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
-                <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                <ColumnConstraints minWidth="10.0" percentWidth="80.0"/>
             </columnConstraints>
 
-            <Button GridPane.columnIndex="0" text="Select picture" onAction="#selectPictureButtonClick" />
-            <Text GridPane.columnIndex="1" id="lblPath" fx:id="textPath" text="Path :" />
+            <Button GridPane.columnIndex="0" text="Select picture" onAction="#selectPictureButtonClick"/>
+            <Text GridPane.columnIndex="1" id="lblPath" fx:id="textPath" text="Path :"/>
         </GridPane>
 
         <GridPane fx:id="gridImage" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.halignment="CENTER"/>
 
     </GridPane>
 
-    <GridPane GridPane.rowIndex="1" GridPane.columnIndex="2" hgap="10" vgap="10" >
+    <GridPane GridPane.rowIndex="1" GridPane.columnIndex="2" hgap="10" vgap="10">
         <columnConstraints>
-            <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
+            <ColumnConstraints minWidth="10.0" percentWidth="100.0"/>
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints minHeight="10.0" percentHeight="10.0" />
-            <RowConstraints minHeight="10.0" percentHeight="35.0" />
-            <RowConstraints minHeight="10.0" percentHeight="35.0" />
-            <RowConstraints minHeight="10.0" percentHeight="20.0" />
+            <RowConstraints minHeight="10.0" percentHeight="10.0"/>
+            <RowConstraints minHeight="10.0" percentHeight="35.0"/>
+            <RowConstraints minHeight="10.0" percentHeight="35.0"/>
+            <RowConstraints minHeight="10.0" percentHeight="20.0"/>
         </rowConstraints>
 
         <GridPane GridPane.rowIndex="0" hgap="10" vgap="10">
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="100.0" />
+                <RowConstraints minHeight="10.0" prefHeight="100.0"/>
             </rowConstraints>
             <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="30.0" />
-                <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-                <ColumnConstraints minWidth="10.0" percentWidth="60.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="30.0"/>
+                <ColumnConstraints minWidth="10.0" percentWidth="10.0"/>
+                <ColumnConstraints minWidth="10.0" percentWidth="60.0"/>
             </columnConstraints>
 
-            <Button text="Select save folder" onAction="#selectSaveFolderButtonClick" />
-            <Text GridPane.columnIndex="1" text="Path :" />
-            <Text GridPane.columnIndex="2" text="${controller.folderSave}" />
+            <Button text="Select save folder" onAction="#selectSaveFolderButtonClick"/>
+            <Text GridPane.columnIndex="1" text="Path :"/>
+            <Text GridPane.columnIndex="2" text="${controller.folderSave}"/>
         </GridPane>
 
         <GridPane GridPane.rowIndex="1" hgap="10" vgap="10">
             <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
-                <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                <ColumnConstraints minWidth="10.0" percentWidth="80.0"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" percentHeight="33.3" />
-                <RowConstraints minHeight="10.0" percentHeight="33.3" />
-                <RowConstraints minHeight="10.0" percentHeight="33.3" />
+                <RowConstraints minHeight="10.0" percentHeight="33.3"/>
+                <RowConstraints minHeight="10.0" percentHeight="33.3"/>
+                <RowConstraints minHeight="10.0" percentHeight="33.3"/>
             </rowConstraints>
 
             <Text text="Name : " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <GridPane GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2" >
+            <GridPane GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2">
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="100.0" />
+                    <RowConstraints minHeight="10.0" prefHeight="100.0"/>
                 </rowConstraints>
                 <columnConstraints>
                     <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
@@ -109,29 +109,30 @@
                 <ComboBox GridPane.columnIndex="0" fx:id="comboBoxLabelsAvailable"
                           promptText="Available" editable="true">
                     <items>
-                        <FXCollections fx:factory="observableArrayList" />
+                        <FXCollections fx:factory="observableArrayList"/>
                     </items>
                 </ComboBox>
                 <ComboBox GridPane.columnIndex="1" fx:id="comboBoxLabelsSelected"
-                          promptText="Labels selected (0)" >
+                          promptText="Labels selected (0)">
                     <items>
-                        <FXCollections fx:factory="observableArrayList" />
+                        <FXCollections fx:factory="observableArrayList"/>
                     </items>
                 </ComboBox>
             </GridPane>
 
             <Text text="Percentage : " GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.valignment="CENTER"/>
-            <GridPane GridPane.rowIndex="1" GridPane.columnIndex="1" >
+            <GridPane GridPane.rowIndex="1" GridPane.columnIndex="1">
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="100.0" />
+                    <RowConstraints minHeight="10.0" prefHeight="100.0"/>
                 </rowConstraints>
                 <columnConstraints>
-                    <ColumnConstraints minWidth="10.0" percentWidth="80.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="80.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
                 </columnConstraints>
                 <Slider fx:id="sliderPercentage" GridPane.columnIndex="0"
-                        majorTickUnit="10" showTickLabels="true" showTickMarks="true" />
-                <Text fx:id="textPercentage" GridPane.columnIndex="1" text="0 %" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                        majorTickUnit="10" showTickLabels="true" showTickMarks="true"/>
+                <Text fx:id="textPercentage" GridPane.columnIndex="1" text="0 %" GridPane.halignment="CENTER"
+                      GridPane.valignment="CENTER"/>
             </GridPane>
 
             <Text text="Time (sec) : " GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.valignment="CENTER"/>
@@ -144,76 +145,79 @@
 
         <GridPane GridPane.rowIndex="2" hgap="10" vgap="10">
             <columnConstraints>
-                <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="100.0"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" percentHeight="10.0" />
-                <RowConstraints minHeight="10.0" percentHeight="20.0" />
-                <RowConstraints minHeight="10.0" percentHeight="20.0" />
-                <RowConstraints minHeight="10.0" percentHeight="20.0" />
-                <RowConstraints minHeight="10.0" percentHeight="20.0" />
-                <RowConstraints minHeight="10.0" percentHeight="10.0" />
+                <RowConstraints minHeight="10.0" percentHeight="10.0"/>
+                <RowConstraints minHeight="10.0" percentHeight="20.0"/>
+                <RowConstraints minHeight="10.0" percentHeight="20.0"/>
+                <RowConstraints minHeight="10.0" percentHeight="20.0"/>
+                <RowConstraints minHeight="10.0" percentHeight="20.0"/>
+                <RowConstraints minHeight="10.0" percentHeight="10.0"/>
             </rowConstraints>
 
-            <Text GridPane.rowIndex="0" text="Filter to apply:" />
+            <Text GridPane.rowIndex="0" text="Filter to apply:"/>
 
             <GridPane GridPane.rowIndex="1" hgap="10" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="90.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="10.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="90.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                    <RowConstraints minHeight="10.0" percentHeight="100.0"/>
                 </rowConstraints>
                 <Text GridPane.columnIndex="0" text="Label :"/>
                 <ComboBox GridPane.columnIndex="1" fx:id="comboBoxFilter"
                           promptText="Apply filter to...">
                     <items>
-                        <FXCollections fx:factory="observableArrayList" />
+                        <FXCollections fx:factory="observableArrayList"/>
                     </items>
                 </ComboBox>
             </GridPane>
 
             <GridPane GridPane.rowIndex="2" hgap="10" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="85.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="60.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                    <RowConstraints minHeight="10.0" percentHeight="100.0"/>
                 </rowConstraints>
                 <ToggleSwitch GridPane.columnIndex="0" text="Color :" fx:id="toggleApplyFilterColor" selected="false"/>
                 <TextField GridPane.columnIndex="1" fx:id="textFieldColorFilter"
-                           promptText="r,g,b,a (ex: 0,144,255,255)" />
+                           promptText="r,g,b,a (ex: 0,144,255,255)"/>
             </GridPane>
 
             <GridPane GridPane.rowIndex="3" hgap="10" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="70.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="60.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                    <RowConstraints minHeight="10.0" percentHeight="100.0"/>
                 </rowConstraints>
-                <ToggleSwitch GridPane.columnIndex="0" text="Border :" fx:id="toggleApplyFilterBorder" selected="false"/>
-                <Button       GridPane.columnIndex="1" text="Select border" onAction="#selectPictureBorderButtonClick"/>
+                <ToggleSwitch GridPane.columnIndex="0" text="Border :" fx:id="toggleApplyFilterBorder"
+                              selected="false"/>
+                <Button GridPane.columnIndex="1" text="Select border" onAction="#selectPictureBorderButtonClick"/>
             </GridPane>
 
             <GridPane GridPane.rowIndex="4" hgap="10" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-                    <ColumnConstraints minWidth="10.0" percentWidth="65.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="20.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="10.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="10.0"/>
+                    <ColumnConstraints minWidth="10.0" percentWidth="60.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" percentHeight="100.0" />
+                    <RowConstraints minHeight="10.0" percentHeight="100.0"/>
                 </rowConstraints>
-                <ToggleSwitch GridPane.columnIndex="0" text="Picture :" fx:id="toggleApplyFilterPicture" selected="false"/>
-                <TextField    GridPane.columnIndex="1" promptText="x" fx:id="textFieldXPosPicture"/>
-                <TextField    GridPane.columnIndex="2" promptText="y" fx:id="textFieldYPosPicture"/>
-                <Button       GridPane.columnIndex="3" text="Select picture" onAction="#selectPictureTamponButtonClick"/>
+                <ToggleSwitch GridPane.columnIndex="0" text="Picture :" fx:id="toggleApplyFilterPicture"
+                              selected="false"/>
+                <TextField GridPane.columnIndex="1" promptText="x" fx:id="textFieldXPosPicture"/>
+                <TextField GridPane.columnIndex="2" promptText="y" fx:id="textFieldYPosPicture"/>
+                <Button GridPane.columnIndex="3" text="Select picture" onAction="#selectPictureTamponButtonClick"/>
             </GridPane>
         </GridPane>
 
